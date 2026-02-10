@@ -1,0 +1,116 @@
+
+%{
+#include <iostream>
+
+extern int yylex();
+
+#define yyerror printf
+
+#include "fol.hpp"
+
+%}
+
+%union {
+	std::string *str_attr;
+}
+
+%token<str_attr> SYMBOL;
+%token<str_attr> VARIABLE;
+%token TRUE;
+%token FALSE;
+%token NOT;
+%token AND;
+%token OR;
+%token IMP;
+%token IFF;
+%token EQ;
+%token NEQ;
+%token FORALL;
+%token EXISTS;
+
+/*
+%type<formula_attr> formula
+%type<formula_attr> quant_formula
+%type<formula_attr> iff_formula
+%type<formula_attr> imp_formula
+%type<formula_attr> or_formula
+%type<formula_attr> and_formula
+%type<formula_attr> unary_formula
+%type<formula_attr> sub_formula
+%type<formula_attr> atomic_formula
+%type<formula_attr> atom
+%type<term_attr> term
+%type<term_seq_attr> term_seq
+*/
+
+%%
+
+input
+	: formula ';' {}
+	;
+
+formula
+	: quant_formula {}
+	;
+
+quant_formula
+	: FORALL  VARIABLE  '.' quant_formula {}
+	| EXISTS  VARIABLE  '.' quant_formula {}
+	| iff_formula {}
+	;
+
+iff_formula
+	: imp_formula IFF iff_formula {}
+	| imp_formula {}
+	;
+
+imp_formula
+	: or_formula IMP imp_formula {}
+	| or_formula {}
+	;
+
+or_formula
+	: or_formula OR and_formula {}
+	| and_formula {}
+	;
+
+and_formula
+	: and_formula AND unary_formula {}
+	| unary_formula {}
+	;
+
+unary_formula
+	: NOT unary_formula {}
+	| sub_formula {}
+	;
+
+sub_formula
+	: atomic_formula {}
+	| '(' formula ')' {}
+	;
+
+atomic_formula
+	: atom {}
+	| TRUE {}
+	| FALSE {}
+	;
+
+atom
+	: SYMBOL {}
+	| SYMBOL '(' term_seq ')' {}
+	| term EQ term {}
+	| term NEQ term {}
+	;
+
+term_seq
+	: term_seq ',' term {}
+	| term {}
+	;
+
+term
+	: VARIABLE {}
+	| SYMBOL {}
+	| SYMBOL '(' term_seq ')' {}
+	;
+
+%%
