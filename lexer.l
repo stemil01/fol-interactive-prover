@@ -21,8 +21,6 @@ false                    return FALSE;
 =\>                      return IMP;
 \<=\>                    return IFF;
 ~			 return NOT;
-=			 return EQ;
-~=			 return NEQ;
 !			 return FORALL;
 \?			 return EXISTS;
 \.                       return *yytext;

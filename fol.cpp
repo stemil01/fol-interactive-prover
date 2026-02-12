@@ -1,8 +1,13 @@
 #include "fol.hpp"
 
 // ptr Pravi pokazivac na formulu/term
-TermPtr ptr(const Term& term) { return std::make_shared<Term>(term); }
-FormulaPtr ptr(const Formula& formula) { return std::make_shared<Formula>(formula); }
+TermPtr ptr(const Term& term) {
+    return std::make_shared<Term>(term);
+}
+
+FormulaPtr ptr(const Formula& formula) {
+    return std::make_shared<Formula>(formula);
+}
 
 // is Proverava da li je formula/term odredjenog tipa
 template<typename T> bool is(const TermPtr& term) { return std::holds_alternative<T>(*term); }
@@ -331,10 +336,10 @@ void print(const FormulaPtr& formula) {
     if(is<Quantifier>(formula)) {
         auto qf = as<Quantifier>(formula);
         switch(qf.type) {
-            case Quantifier::All: std::cout << "A"; break;
-            case Quantifier::Exists: std::cout << "E"; break;
+            case Quantifier::All: std::cout << "!"; break;
+            case Quantifier::Exists: std::cout << "?"; break;
         }
-        std::cout << qf.var << " ";
+        std::cout << qf.var << ". ";
         print(qf.subformula);
     }
 }
