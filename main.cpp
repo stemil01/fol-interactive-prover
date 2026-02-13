@@ -1,5 +1,5 @@
-#include <iostream>
 #include "fol.hpp"
+#include "itp.hpp"
 
 extern int yyparse();
 extern int yylex_destroy();
@@ -8,8 +8,7 @@ FormulaPtr input_formula = nullptr;
 
 int main() {
     if (yyparse() == 0) {
-        print(input_formula);
-        std::cout << std::endl;
+        ITP::interactive_proof(input_formula);
     }
 
     yylex_destroy();

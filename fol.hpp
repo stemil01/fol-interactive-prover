@@ -143,7 +143,9 @@ TermPtr substitute(const TermPtr& term, const std::string& var, const TermPtr& s
 FormulaPtr substitute(const FormulaPtr& formula, const std::string& var, const TermPtr& term);
 
 // Ispis formule
-void print(const TermPtr& term);
-void print(const FormulaPtr& formula);
+void print(std::ostream &os, const TermPtr& term);
+void print(std::ostream &os, const FormulaPtr& formula);
+
+std::ostream &operator<<(std::ostream &os, const FormulaPtr &formula);
 
 #endif //FOL_HPP

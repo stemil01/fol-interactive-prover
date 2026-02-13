@@ -284,62 +284,67 @@ FormulaPtr substitute(const FormulaPtr& formula, const std::string& var, const T
 
 // Ispis formule
 
-void print(const TermPtr& term) {
+void print(std::ostream &os, const TermPtr& term) {
     if (is<Variable>(term))
-        std::cout << as<Variable>(term).name;
+        os << as<Variable>(term).name;
     if (is<Function>(term)) {
         auto function = as<Function>(term);
-        std::cout << function.symbol;
+        os << function.symbol;
         if(!function.args.empty()) {
-            std::cout << "(";
-            print(function.args[0]);
+            os << "(";
+            print(os, function.args[0]);
             for (unsigned i = 1; i < function.args.size(); i++) {
-                std::cout << ", ";
-                print(function.args[i]);
+                os << ", ";
+                print(os, function.args[i]);
             }
-            std::cout << ")";
+            os << ")";
         }
     }
 }
 
-void print(const FormulaPtr& formula) {
+void print(std::ostream &os, const FormulaPtr& formula) {
     if(is<Atom>(formula)) {
         auto atom = as<Atom>(formula);
-        std::cout << atom.symbol;
+        os << atom.symbol;
         if(!atom.args.empty()) {
-            std::cout << "(";
-            print(atom.args[0]);
+            os << "(";
+            print(os, atom.args[0]);
             for (unsigned i = 1; i < atom.args.size(); i++) {
-                std::cout << ", ";
-                print(atom.args[i]);
+                os << ", ";
+                print(os, atom.args[i]);
             }
-            std::cout << ")";
+            os << ")";
         }
     }
     if(is<Not>(formula)) {
-        std::cout << "~";
-        print(as<Not>(formula).subformula);
+        os << "~";
+        print(os, as<Not>(formula).subformula);
     }
     if(is<Binary>(formula)) {
         auto binary = as<Binary>(formula);
-        std::cout << "(";
-        print(binary.l);
+        os << "(";
+        print(os, binary.l);
         switch(binary.type) {
-            case Binary::And:  std::cout << " & "; break;
-            case Binary::Or:   std::cout << " | "; break;
-            case Binary::Impl: std::cout << " -> "; break;
-            case Binary::Eq:   std::cout << " <-> "; break;
+            case Binary::And:  os << " & "; break;
+            case Binary::Or:   os << " | "; break;
+            case Binary::Impl: os << " -> "; break;
+            case Binary::Eq:   os << " <-> "; break;
         }
-        print(binary.r);
-        std::cout << ")";
+        print(os, binary.r);
+        os << ")";
     }
     if(is<Quantifier>(formula)) {
         auto qf = as<Quantifier>(formula);
         switch(qf.type) {
-            case Quantifier::All: std::cout << "!"; break;
-            case Quantifier::Exists: std::cout << "?"; break;
+            case Quantifier::All: os << "!"; break;
+            case Quantifier::Exists: os << "?"; break;
         }
-        std::cout << qf.var << ". ";
-        print(qf.subformula);
+        os << qf.var << ". ";
+        print(os, qf.subformula);
     }
+}
+
+std::ostream &operator<<(std::ostream &os, const FormulaPtr &formula) {
+    print(os, formula);
+    return os;
 }
