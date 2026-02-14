@@ -10,6 +10,7 @@
 
 void ITP::interactive_proof(FormulaPtr formula) {
     std::stack<Goal> goals;
+    std::stack<GoalDiff> diffs;
     goals.push(Goal(std::set<Variable>(), std::set<FormulaPtr>(), formula));
     print_goals(goals);
 
@@ -25,16 +26,20 @@ void ITP::interactive_proof(FormulaPtr formula) {
             print_goals(goals);
         }
         else if (rule == "REVERT") {
-            std::cout << "Reverting to the previous state" << std::endl;
+            if (diffs.empty()) {
+                std::cout << "No previous state exists." << std::endl;
+            }
+            else {
+                GoalDiff last_diff = diffs.top();
+                diffs.pop();
+                last_diff.revert(goals);
+            }
         }
         else {
             try {
-                std::vector<Goal> generated_goals = ND::apply_rule(rule, current_goal);
-                goals.pop();
-                for (auto rit = generated_goals.rbegin(); rit != generated_goals.rend(); rit++) {
-                    goals.push(*rit);
-                }
-                print_goals(goals);
+                GoalDiff goal_diff(ND::apply_rule(rule, current_goal));
+                goal_diff.apply(goals);
+                diffs.push(goal_diff);
             }
             catch (const std::exception &e) {
                 std::cerr << e.what() << std::endl;
@@ -121,7 +126,7 @@ std::string ITP::get_rule_from_user() {
             iss >> rule;
             return rule;
         }
-        else {
+        else if (command != "") {
             std::cout << "\tCommand unknown. Run 'help' for instructions." << std::endl;
         }
     }
@@ -131,6 +136,8 @@ void ITP::clear_screen() {
     std::cout << "\033[2J\033[H";
     std::cout.flush();
 }
+
+Goal::Goal() {}
 
 Goal::Goal(const std::set<Variable> &free_variables, const std::set<FormulaPtr> &lhs, FormulaPtr rhs)
     : m_free_variables(free_variables), m_lhs(lhs), m_rhs(rhs) {}
@@ -172,4 +179,26 @@ void Goal::print(std::ostream &os) const {
 std::ostream &operator<<(std::ostream &os, const Goal &goal) {
     goal.print(os);
     return os;
+}
+
+GoalDiff::GoalDiff(const std::vector<Goal> &added) : m_added(added) {}
+
+void GoalDiff::apply(std::stack<Goal> &goals) {
+    m_removed = goals.top();
+    goals.pop();
+
+    for (auto rit = m_added.rbegin(); rit != m_added.rend(); rit++) {
+        goals.push(*rit);
+    }
+
+    ITP::print_goals(goals);
+}
+
+void GoalDiff::revert(std::stack<Goal> &goals) const {
+    for (const Goal &_ : m_added) {
+        goals.pop();
+    }
+
+    goals.push(m_removed);
+    ITP::print_goals(goals);
 }

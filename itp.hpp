@@ -13,9 +13,9 @@ class Goal;
 class ITP {
 public:
     static void interactive_proof(FormulaPtr formula);
+    static void print_goals(std::stack<Goal> goals);
 
 private:
-    static void print_goals(std::stack<Goal> goals);
     static std::string get_rule_from_user();
     static void clear_screen();
 };
@@ -23,6 +23,7 @@ private:
 // Class representing a goal of an interactive proof
 class Goal {
 public:
+    Goal();
     Goal(const std::set<Variable> &free_variables, const std::set<FormulaPtr> &lhs, FormulaPtr rhs);
 
     std::set<Variable> get_free_variables() const;
@@ -38,5 +39,18 @@ private:
 };
 
 std::ostream &operator<<(std::ostream &os, const Goal &goal);
+
+// Class representing a change in the goals stack after an ND rule is applied
+class GoalDiff {
+public:
+    GoalDiff(const std::vector<Goal> &added);
+
+    void apply(std::stack<Goal> &goals);
+    void revert(std::stack<Goal> &goals) const;
+
+private:
+    Goal m_removed;
+    std::vector<Goal> m_added;
+};
 
 #endif
