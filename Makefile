@@ -15,7 +15,8 @@ OBJS = \
 	$(BUILDDIR)/parser.o \
 	$(BUILDDIR)/lexer.o \
 	$(BUILDDIR)/fol.o \
-	$(BUILDDIR)/itp.o
+	$(BUILDDIR)/itp.o \
+	$(BUILDDIR)/nd.o \
 
 # Final executable
 fol-ip: $(OBJS)

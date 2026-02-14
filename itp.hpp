@@ -18,6 +18,8 @@ private:
     static void print_goals(std::stack<Goal> goals);
     static std::string get_rule_from_user();
     static void clear_screen();
+
+    static std::set<std::string> m_available_rules;
 };
 
 // Class representing a goal of an interactive proof

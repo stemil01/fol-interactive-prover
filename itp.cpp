@@ -1,8 +1,16 @@
-#include "itp.hpp"
-#include "fol.hpp"
 #include <cstdlib>
+#include <ostream>
 #include <sstream>
 #include <string>
+
+#include "itp.hpp"
+#include "fol.hpp"
+#include "nd.hpp"
+
+std::set<std::string> ITP::m_available_rules = {
+    "notI", "notE", "conjI", "conjunct1", "conjunct2", "disjI1", "disjI2", "disjE",
+    "impI", "impE", "iffI", "iffE", "allI", "allE", "exI", "exE", "assumption",
+};
 
 void ITP::interactive_proof(FormulaPtr formula) {
     std::stack<Goal> goals;
@@ -21,7 +29,11 @@ void ITP::interactive_proof(FormulaPtr formula) {
             std::cout << "Reverting to the previous state" << std::endl;
         }
         else {
-            std::cout << "Applying rule: " << rule << std::endl;
+            std::vector<Goal> generated_goals = ND::apply_rule(rule, current_goal);
+            goals.pop();
+            for (auto rit = generated_goals.rbegin(); rit != generated_goals.rend(); rit++) {
+                goals.push(*rit);
+            }
         }
     }
 }
@@ -73,13 +85,16 @@ std::string ITP::get_rule_from_user() {
             std::cout << "\timpI\t\t - implication introduction\n";
             std::cout << "\timpE\t\t - implication elimination\n\n";
 
-            std::cout << "\tassumption\t - use the assumption on the left-hand side\n\n";
+            std::cout << "\tiffI\t\t - equivalence introduction\n";
+            std::cout << "\tiffE\t\t - equivalence elimination\n\n";
 
             std::cout << "\tallI\t\t - universal quantifier introduction\n";
             std::cout << "\tallE\t\t - universal quantifier elimination\n\n";
 
             std::cout << "\texI\t\t - existential quantifier introduction\n";
-            std::cout << "\texE\t\t - existential quantifier elimination" << std::endl;
+            std::cout << "\texE\t\t - existential quantifier elimination\n\n";
+
+            std::cout << "\tassumption\t - use the assumption on the left-hand side" << std::endl;
         }
         else if (command == "revert") {
             return "REVERT";
@@ -93,10 +108,15 @@ std::string ITP::get_rule_from_user() {
         else if (command == "apply") {
             std::string rule;
             iss >> rule;
-            return rule;
+            if (!m_available_rules.contains(rule)) {
+                std::cout << "\tUnknown rule. Run 'rules' to see the available rules." << std::endl;
+            }
+            else {
+                return rule;
+            }
         }
         else {
-            std::cout << "Command unknown. Run 'help' for instructions." << std::endl;
+            std::cout << "\tCommand unknown. Run 'help' for instructions." << std::endl;
         }
     }
 }
