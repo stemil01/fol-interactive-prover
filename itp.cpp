@@ -12,7 +12,17 @@ void ITP::interactive_proof(FormulaPtr formula) {
         print_goals(goals);
         Goal current_goal = goals.top();
     
-        process_user_input();
+        std::string rule = get_rule_from_user();
+        if (rule == "EOF") {
+            std::cout << std::endl;
+            exit(EXIT_FAILURE);
+        }
+        else if (rule == "REVERT") {
+            std::cout << "Reverting to the previous state" << std::endl;
+        }
+        else {
+            std::cout << "Applying rule: " << rule << std::endl;
+        }
     }
 }
 
@@ -24,16 +34,14 @@ void ITP::print_goals(std::stack<Goal> goals) {
     }
 }
 
-void ITP::process_user_input() {
+std::string ITP::get_rule_from_user() {
     std::string line;
-    bool goals_changed = false;
-    while (!goals_changed) {
+    while (true) {
         std::cout << "> ";
-        std::string line;
+
         if (!std::getline(std::cin, line)) {
             // End of input reached
-            std::cout << std::endl;
-            exit(EXIT_FAILURE);
+            return "EOF";
         }
 
         std::istringstream iss(line);
@@ -43,18 +51,38 @@ void ITP::process_user_input() {
 
         if (command == "help") {
             std::cout << "available options:\n";
-            std::cout << "\thelp - prints this help\n";
-            std::cout << "\tapply rule - prints all the available rules\n";
-            std::cout << "\trules - prints all the available rules\n";
-            std::cout << "\tdone - exit if all goals are met\n";
-            std::cout << "\tclear - clear the screen\n";
-            std::cout << "\trevert - revert the last appled rule" << std::endl;
+            std::cout << "\thelp\t\t - prints this help\n";
+            std::cout << "\tapply RULE\t - apply the rule RULE on the first goal\n";
+            std::cout << "\trules\t\t - prints all the available rules\n";
+            std::cout << "\tdone\t\t - exit if all goals are met\n";
+            std::cout << "\tclear\t\t - clear the screen\n";
+            std::cout << "\trevert\t\t - revert the last appled rule" << std::endl;
         }
         else if (command == "rules") {
-            std::cout << "printing rules" << std::endl;
+            std::cout << "\tnotI\t\t - negation introduction\n";
+            std::cout << "\tnotE\t\t - negation elimination\n\n";
+
+            std::cout << "\tconjI\t\t - conjunction introduction\n";
+            std::cout << "\tconjunct1\t - conjunction elimination on the first conjunct\n";
+            std::cout << "\tconjunct2\t - conjunction elimination on the second conjunct\n\n";
+
+            std::cout << "\tdisjI1\t\t - disjunction introduction on the first disjunct\n";
+            std::cout << "\tdisjI2\t\t - disjunction introduction on the second disjunct\n";
+            std::cout << "\tdisjE\t\t - disjunction elimination\n\n";
+
+            std::cout << "\timpI\t\t - implication introduction\n";
+            std::cout << "\timpE\t\t - implication elimination\n\n";
+
+            std::cout << "\tassumption\t - use the assumption on the left-hand side\n\n";
+
+            std::cout << "\tallI\t\t - universal quantifier introduction\n";
+            std::cout << "\tallE\t\t - universal quantifier elimination\n\n";
+
+            std::cout << "\texI\t\t - existential quantifier introduction\n";
+            std::cout << "\texE\t\t - existential quantifier elimination" << std::endl;
         }
         else if (command == "revert") {
-            std::cout << "reverting to a previous state" << std::endl;
+            return "REVERT";
         }
         else if (command == "done") {
             std::cout << "done case" << std::endl;
@@ -65,8 +93,7 @@ void ITP::process_user_input() {
         else if (command == "apply") {
             std::string rule;
             iss >> rule;
-            std::cout << "Applying " << rule << std::endl;
-            goals_changed = true;
+            return rule;
         }
         else {
             std::cout << "Command unknown. Run 'help' for instructions." << std::endl;

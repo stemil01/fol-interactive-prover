@@ -25,6 +25,7 @@ false                    return FALSE;
 \?			 return EXISTS;
 \.                       return *yytext;
 ;                        return *yytext;
-[ \t\n]
+\n                        return *yytext;
+[ \t]
 
 %%

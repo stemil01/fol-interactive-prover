@@ -16,7 +16,7 @@ public:
 
 private:
     static void print_goals(std::stack<Goal> goals);
-    static void process_user_input();
+    static std::string get_rule_from_user();
     static void clear_screen();
 };
 
