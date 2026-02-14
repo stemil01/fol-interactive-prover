@@ -151,11 +151,11 @@ atomic_formula
 		$$ = $1;
 	}
 	| TRUE {
-		FormulaPtr formula = ptr(Atom{"true", {}});
+		FormulaPtr formula = trueConst();
 		$$ = new FormulaPtr(formula);
 	}
 	| FALSE {
-		FormulaPtr formula = ptr(Atom{"false", {}});
+		FormulaPtr formula = falseConst();
 		$$ = new FormulaPtr(formula);
 	}
 	;

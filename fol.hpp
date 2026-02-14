@@ -63,6 +63,9 @@ struct Quantifier {
 TermPtr ptr(const Term& term);
 FormulaPtr ptr(const Formula& formula);
 
+FormulaPtr falseConst();
+FormulaPtr trueConst();
+
 // is Proverava da li je formula/term odredjenog tipa
 template<typename T> bool is(const TermPtr& term);
 template<typename T> bool is(const FormulaPtr& formula);
@@ -141,6 +144,13 @@ std::string uniqueVar(const FormulaPtr& formula, const TermPtr& term);
 // Ovo ce nam biti neophodno prilikom metode rezolucije
 TermPtr substitute(const TermPtr& term, const std::string& var, const TermPtr& subterm);
 FormulaPtr substitute(const FormulaPtr& formula, const std::string& var, const TermPtr& term);
+
+// Provera formula na jednakost
+bool operator==(const TermPtr &s, const TermPtr &t);
+bool operator==(const FormulaPtr &p, const FormulaPtr &q);
+
+bool operator!=(const TermPtr &s, const TermPtr &t);
+bool operator!=(const FormulaPtr &p, const FormulaPtr &q);
 
 // Ispis formule
 void print(std::ostream &os, const TermPtr& term);

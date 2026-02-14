@@ -9,6 +9,14 @@ FormulaPtr ptr(const Formula& formula) {
     return std::make_shared<Formula>(formula);
 }
 
+FormulaPtr falseConst() {
+    return ptr(Atom{"false", {}});
+}
+
+FormulaPtr trueConst() {
+    return ptr(Atom{"true", {}});
+}
+
 // is Proverava da li je formula/term odredjenog tipa
 template<typename T> bool is(const TermPtr& term) { return std::holds_alternative<T>(*term); }
 template<typename T> bool is(const FormulaPtr& formula) { return std::holds_alternative<T>(*formula); }
@@ -280,6 +288,81 @@ FormulaPtr substitute(const FormulaPtr& formula, const std::string& var, const T
         return ptr(Quantifier{qf.type, qf.var, substitute(qf.subformula, var, term)});
     }
     return nullptr;
+}
+
+// Provera na jednakost
+
+bool operator==(const TermPtr &s, const TermPtr &t) {
+    if (is<Variable>(s)) {
+        return is<Variable>(t) && as<Variable>(s).name == as<Variable>(t).name;
+    }
+
+    if (!is<Function>(t)) {
+        return false;
+    }
+
+    Function sf = as<Function>(s);
+    Function tf = as<Function>(t);
+
+    if (sf.symbol != tf.symbol || sf.args.size() != tf.args.size()) {
+        return false;
+    }
+
+    for (unsigned i = 0; i < sf.args.size(); i++) {
+        if (!(sf.args[i] == tf.args[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool operator!=(const TermPtr &s, const TermPtr &t) {
+    return !(s == t);
+}
+
+bool operator==(const FormulaPtr &p, const FormulaPtr &q) {
+    if (is<Atom>(p)) {
+        if (!is<Atom>(q)) {
+            return false;
+        }
+
+        Atom pa = as<Atom>(p);
+        Atom qa = as<Atom>(q);
+
+        if (pa.symbol != qa.symbol || pa.args.size() != qa.args.size()) {
+            return false;
+        }
+
+        for (unsigned i = 0; i < pa.args.size(); i++) {
+            if (pa.args[i] != qa.args[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    if (is<Not>(p)) {
+        return is<Not>(q) && as<Not>(p).subformula == as<Not>(q).subformula;
+    }
+
+    if (is<Binary>(p)) {
+        return is<Binary>(q)
+            && as<Binary>(p).type == as<Binary>(q).type
+            && as<Binary>(p).l == as<Binary>(q).l
+            && as<Binary>(p).r == as<Binary>(q).r;
+    }
+
+    // Ostaje slucaj da je p kvanifikator
+    return is<Quantifier>(q)
+        && as<Quantifier>(p).type == as<Quantifier>(q).type
+        && as<Quantifier>(p).var == as<Quantifier>(q).var
+        && as<Quantifier>(p).subformula == as<Quantifier>(q).subformula;
+}
+
+bool operator!=(const FormulaPtr &p, const FormulaPtr &q) {
+    return !(p == q);
 }
 
 // Ispis formule
