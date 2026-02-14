@@ -1,5 +1,7 @@
 #include "itp.hpp"
 #include "fol.hpp"
+#include <cstdlib>
+#include <sstream>
 #include <string>
 
 void ITP::interactive_proof(FormulaPtr formula) {
@@ -9,10 +11,8 @@ void ITP::interactive_proof(FormulaPtr formula) {
     while (!goals.empty()) {
         print_goals(goals);
         Goal current_goal = goals.top();
-        goals.pop();
     
-        std::string rule_to_apply = get_user_input();
-        std::cout << rule_to_apply << std::endl;
+        process_user_input();
     }
 }
 
@@ -24,10 +24,59 @@ void ITP::print_goals(std::stack<Goal> goals) {
     }
 }
 
-std::string ITP::get_user_input() {
+void ITP::process_user_input() {
     std::string line;
-    std::getline(std::cin, line);
-    return line.substr(line.find(' ') + 1, line.size());
+    bool goals_changed = false;
+    while (!goals_changed) {
+        std::cout << "> ";
+        std::string line;
+        if (!std::getline(std::cin, line)) {
+            // End of input reached
+            std::cout << std::endl;
+            exit(EXIT_FAILURE);
+        }
+
+        std::istringstream iss(line);
+
+        std::string command;
+        iss >> command;
+
+        if (command == "help") {
+            std::cout << "available options:\n";
+            std::cout << "\thelp - prints this help\n";
+            std::cout << "\tapply rule - prints all the available rules\n";
+            std::cout << "\trules - prints all the available rules\n";
+            std::cout << "\tdone - exit if all goals are met\n";
+            std::cout << "\tclear - clear the screen\n";
+            std::cout << "\trevert - revert the last appled rule" << std::endl;
+        }
+        else if (command == "rules") {
+            std::cout << "printing rules" << std::endl;
+        }
+        else if (command == "revert") {
+            std::cout << "reverting to a previous state" << std::endl;
+        }
+        else if (command == "done") {
+            std::cout << "done case" << std::endl;
+        }
+        else if (command == "clear") {
+            clear_screen();
+        }
+        else if (command == "apply") {
+            std::string rule;
+            iss >> rule;
+            std::cout << "Applying " << rule << std::endl;
+            goals_changed = true;
+        }
+        else {
+            std::cout << "Command unknown. Run 'help' for instructions." << std::endl;
+        }
+    }
+}
+
+void ITP::clear_screen() {
+    std::cout << "\033[2J\033[H";
+    std::cout.flush();
 }
 
 Goal::Goal(const std::set<Variable> &free_variables, const std::set<FormulaPtr> &lhs, FormulaPtr rhs)

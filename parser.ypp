@@ -50,6 +50,7 @@ input
 	: formula ';' {
 		input_formula = *$1;
 		delete $1;
+		return 0;
 	}
 	;
 

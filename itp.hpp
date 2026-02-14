@@ -16,7 +16,8 @@ public:
 
 private:
     static void print_goals(std::stack<Goal> goals);
-    static std::string get_user_input();
+    static void process_user_input();
+    static void clear_screen();
 };
 
 // Class representing a goal of an interactive proof
