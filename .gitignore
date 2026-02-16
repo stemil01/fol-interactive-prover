@@ -3,3 +3,50 @@ compile_commands.json
 .cache
 
 *.txt
+
+# Core LaTeX auxiliary files
+doc/*.aux
+doc/*.log
+doc/*.out
+doc/*.toc
+doc/*.lof
+doc/*.lot
+doc/*.fls
+doc/*.fdb_latexmk
+doc/*.synctex.gz
+doc/*.synctex(busy)
+doc/*.nav
+doc/*.snm
+doc/*.vrb
+
+# Bibliography
+doc/*.bbl
+doc/*.blg
+doc/*.run.xml
+doc/*.bcf
+
+# Index / glossaries
+doc/*.idx
+doc/*.ilg
+doc/*.ind
+doc/*.glg
+doc/*.glo
+doc/*.gls
+doc/*.acn
+doc/*.acr
+doc/*.alg
+
+# LaTeXmk
+doc/latexmkrc
+doc/*.xdv
+
+# Temporary / backup files
+doc/*~
+doc/*.swp
+doc/*.swo
+doc/*.bak
+
+doc/uputstvo_seminarski.tex
+
+# Generated PDFs
+doc/*.pdf

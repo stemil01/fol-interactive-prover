@@ -1,7 +1,6 @@
 CXX = g++
 CXXFLAGS = -std=c++20 -Wall -Wextra -I. -I$(BUILDDIR)
 
-
 BUILDDIR = build
 PARSERDIR = parsers
 
@@ -26,7 +25,7 @@ OBJS = \
 	$(BUILDDIR)/nd.o \
 
 # Final executable
-fol-ip: $(OBJS)
+folip: $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o $(BUILDDIR)/$@
 
 # Ensure build/ exists
