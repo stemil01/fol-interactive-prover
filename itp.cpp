@@ -151,6 +151,22 @@ FormulaPtr Goal::get_rhs() const {
     return m_rhs;
 }
 
+std::string Goal::unused_variable(const std::string &base_var) const {
+    std::set<std::string> used_variables = m_arbitrary_vars;
+    for (const FormulaPtr &f : m_lhs) {
+        getVariables(f, used_variables, false);
+    }
+    getVariables(m_rhs, used_variables, false);
+
+    std::string var = base_var;
+    int num = 1;
+    while (used_variables.contains(var)) {
+        var = base_var + std::to_string(num);
+        num++;
+    }
+    return var;
+}
+
 void Goal::print(std::ostream &os) const {
     auto fv_it = m_arbitrary_vars.begin();
     while (fv_it != m_arbitrary_vars.end()) {

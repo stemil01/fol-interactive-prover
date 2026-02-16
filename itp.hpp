@@ -30,6 +30,8 @@ public:
     std::set<FormulaPtr> get_lhs() const;
     FormulaPtr get_rhs() const;
 
+    std::string unused_variable(const std::string &base_var) const;
+
     void print(std::ostream &os) const;
 
 private:

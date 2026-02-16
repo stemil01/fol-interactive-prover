@@ -135,10 +135,10 @@ std::vector<Goal> ND::conjI(const Goal &goal) {
 std::vector<Goal> ND::conjE(const Goal &goal) {
     std::set<FormulaPtr> lhs = goal.get_lhs();
 
-    // We search for the first occurence of a implication formula
+    // We search for the first occurence of a conjunction formula
     // on the left hand side of the current goal. However, this
     // is not always sufficient, and the user should be able to
-    // specify the implication formula in the general case.
+    // specify the conjunction formula in the general case.
     FormulaPtr conj_formula;
     bool found_conj = false;
     for (auto it = lhs.begin(); !found_conj && it != lhs.end(); it++) {
@@ -309,7 +309,7 @@ std::vector<Goal> ND::impE(const Goal &goal) {
     std::set<FormulaPtr> lhs = goal.get_lhs();
     FormulaPtr rhs = goal.get_rhs();
 
-    // We search for the first occurence of a implication formula
+    // We search for the first occurence of an implication formula
     // on the left hand side of the current goal. However, this
     // is not always sufficient, and the user should be able to
     // specify the implication formula in the general case.
@@ -359,10 +359,10 @@ std::vector<Goal> ND::iffI(const Goal &goal) {
 std::vector<Goal> ND::iffE(const Goal &goal) {
     std::set<FormulaPtr> lhs = goal.get_lhs();
 
-    // We search for the first occurence of a implication formula
+    // We search for the first occurence of an equivalence formula
     // on the left hand side of the current goal. However, this
     // is not always sufficient, and the user should be able to
-    // specify the implication formula in the general case.
+    // specify the equivalence formula in the general case.
     FormulaPtr equiv_formula;
     bool found_equiv = false;
     for (auto it = lhs.begin(); !found_equiv && it != lhs.end(); it++) {
@@ -398,7 +398,13 @@ std::vector<Goal> ND::allI(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule allI.");
     }
 
-    return {goal};
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
+    std::string arbitrary_var = goal.unused_variable(all.var);
+    arbitrary_vars.insert(arbitrary_var);
+    std::set<FormulaPtr> lhs = goal.get_lhs();
+    rhs = substitute(all.subformula, all.var, ptr(Variable{arbitrary_var}));
+
+    return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
 std::vector<Goal> ND::allE(const Goal &goal) {
@@ -410,7 +416,35 @@ std::vector<Goal> ND::exI(const Goal &goal) {
 }
 
 std::vector<Goal> ND::exE(const Goal &goal) {
-    return {goal};
+    std::set<FormulaPtr> lhs = goal.get_lhs();
+
+    // We search for the first occurence of an existential formula
+    // on the left hand side of the current goal. However, this
+    // is not always sufficient, and the user should be able to
+    // specify the existential formula in the general case.
+    FormulaPtr ex_formula;
+    bool found_ex = false;
+    for (auto it = lhs.begin(); !found_ex && it != lhs.end(); it++) {
+        if (is<Quantifier>(*it) && as<Quantifier>(*it).type == Quantifier::Exists) {
+            ex_formula = *it;
+            found_ex = true;
+        }
+    }
+    if (!found_ex) {
+        throw std::runtime_error("Failed to apply rule exE.");
+    }
+
+    Quantifier quant = as<Quantifier>(ex_formula);
+
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
+    std::string arbitrary_var = goal.unused_variable(quant.var);
+    arbitrary_vars.insert(arbitrary_var);
+
+    lhs.erase(ex_formula);
+    lhs.insert(substitute(quant.subformula, quant.var, ptr(Variable{arbitrary_var})));
+    FormulaPtr rhs = goal.get_rhs();
+
+    return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
 std::vector<Goal> ND::assumption(const Goal &goal) {
