@@ -18,7 +18,7 @@ void ITP::interactive_proof(FormulaPtr formula) {
         Goal current_goal = goals.top();
     
         std::string rule = get_rule_from_user();
-        if (rule == "EOF") {
+        if (rule == "EOF" || rule == "EXIT") {
             std::cout << std::endl;
             exit(EXIT_FAILURE);
         }
@@ -75,12 +75,16 @@ std::string ITP::get_rule_from_user() {
 
         if (command == "help") {
             std::cout << "available options:\n";
-            std::cout << "\thelp\t\t - prints this help\n";
-            std::cout << "\trules\t\t - prints all the available rules\n";
+            std::cout << "\thelp\t\t - print this help\n";
+            std::cout << "\texit\t\t - exit the interactive console\n";
+            std::cout << "\trules\t\t - print all the available rules\n";
             std::cout << "\tgoals\t\t - print the remaining goals\n";
-            std::cout << "\trevert\t\t - revert the last appled rule\n";
+            std::cout << "\trevert\t\t - revert to the state before the last rule was applied\n";
             std::cout << "\tclear\t\t - clear the screen\n";
             std::cout << "\tapply RULE\t - apply the rule RULE on the first goal" << std::endl;
+        }
+        else if (command == "exit") {
+            return "EXIT";
         }
         else if (command == "rules") {
             std::cout << "\tnotI\t\t - negation introduction\n";
