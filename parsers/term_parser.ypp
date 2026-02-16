@@ -7,7 +7,7 @@ extern int termlex();
 
 #define termerror printf
 
-#include "fol.hpp"
+#include "src/fol.hpp"
 
 extern TermPtr input_term;
 

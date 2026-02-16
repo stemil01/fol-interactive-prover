@@ -4,7 +4,7 @@
 %option nounput
 
 %{
-#include "fol.hpp"
+#include "src/fol.hpp"
 #include "formula_parser.hpp"
 %}
 

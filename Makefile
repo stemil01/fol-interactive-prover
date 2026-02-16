@@ -2,6 +2,7 @@ CXX = g++
 CXXFLAGS = -std=c++20 -Wall -Wextra -I. -I$(BUILDDIR)
 
 BUILDDIR = build
+SRCDIR = src
 PARSERDIR = parsers
 
 # Generated sources
@@ -33,14 +34,14 @@ $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
 # Compile .cpp -> build/*.o
-$(BUILDDIR)/%.o: %.cpp | $(BUILDDIR)
+$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp | $(BUILDDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Bison: generate C++ source + header into build/
-$(FORMULA_PARSER_CPP) $(FORMULA_PARSER_HPP): $(PARSERDIR)/formula_parser.ypp fol.hpp | $(BUILDDIR)
+$(FORMULA_PARSER_CPP) $(FORMULA_PARSER_HPP): $(PARSERDIR)/formula_parser.ypp $(SRCDIR)/fol.hpp | $(BUILDDIR)
 	bison --header=$(FORMULA_PARSER_HPP) -o $(FORMULA_PARSER_CPP) $<
 
-$(TERM_PARSER_CPP) $(TERM_PARSER_HPP): $(PARSERDIR)/term_parser.ypp fol.hpp | $(BUILDDIR)
+$(TERM_PARSER_CPP) $(TERM_PARSER_HPP): $(PARSERDIR)/term_parser.ypp $(SRCDIR)/fol.hpp | $(BUILDDIR)
 	bison --header=$(TERM_PARSER_HPP) -o $(TERM_PARSER_CPP) $<
 
 # Flex: generate C++ source into build/

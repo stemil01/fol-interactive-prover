@@ -7,7 +7,7 @@ extern int formulalex();
 
 #define formulaerror printf
 
-#include "fol.hpp"
+#include "src/fol.hpp"
 
 extern FormulaPtr input_formula;
 
