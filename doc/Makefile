@@ -3,7 +3,7 @@ MAIN = main
 
 # LaTeX engine via latexmk
 LATEXMK = latexmk
-LATEXMK_FLAGS = -xelatex -interaction=nonstopmode -halt-on-error
+LATEXMK_FLAGS = -xelatex -interaction=nonstopmode -bibtex -halt-on-error
 
 .PHONY: all pdf clean distclean watch
 
@@ -24,4 +24,4 @@ clean:
 
 # Remove everything, including the PDF
 distclean:
-	$(LATEXMK) -C
+	$(LATEXMK) -bibtex -C
