@@ -8,6 +8,8 @@
 #include "fol.hpp"
 #include "nd.hpp"
 
+TermPtr input_term = nullptr;
+
 void ITP::interactive_proof(FormulaPtr formula) {
     std::stack<Goal> goals;
     std::stack<GoalDiff> diffs;
@@ -17,15 +19,15 @@ void ITP::interactive_proof(FormulaPtr formula) {
     while (!goals.empty()) {
         Goal current_goal = goals.top();
     
-        std::string rule = get_rule_from_user();
-        if (rule == "EOF" || rule == "EXIT") {
+        std::string command = get_command_from_user();
+        if (command == "EOF" || command == "EXIT") {
             std::cout << std::endl;
-            exit(EXIT_FAILURE);
+            break;
         }
-        else if (rule == "GOALS") {
+        else if (command == "GOALS") {
             print_goals(goals);
         }
-        else if (rule == "REVERT") {
+        else if (command == "REVERT") {
             if (diffs.empty()) {
                 std::cout << "No previous state exists." << std::endl;
             }
@@ -36,8 +38,12 @@ void ITP::interactive_proof(FormulaPtr formula) {
             }
         }
         else {
+            size_t colon_index = command.find(':');
+            if (colon_index != std::string::npos) {
+                std::string rule = command.substr(0, command.find(':'));
+            }
             try {
-                GoalDiff goal_diff(ND::apply_rule(rule, current_goal));
+                GoalDiff goal_diff(ND::apply_rule(command, current_goal, input_term));
                 goal_diff.apply(goals);
                 diffs.push(goal_diff);
             }
@@ -47,7 +53,9 @@ void ITP::interactive_proof(FormulaPtr formula) {
         }
     }
 
-    std::cout << "All goals resolved.\nProof complete." << std::endl;
+    if (goals.empty()) {
+        std::cout << "All goals resolved.\nProof complete." << std::endl;
+    }
 }
 
 void ITP::print_goals(std::stack<Goal> goals) {
@@ -58,7 +66,7 @@ void ITP::print_goals(std::stack<Goal> goals) {
     }
 }
 
-std::string ITP::get_rule_from_user() {
+std::string ITP::get_command_from_user() {
     std::string line;
     while (true) {
         std::cout << "> ";
@@ -75,13 +83,14 @@ std::string ITP::get_rule_from_user() {
 
         if (command == "help") {
             std::cout << "available options:\n";
-            std::cout << "\thelp\t\t - print this help\n";
-            std::cout << "\texit\t\t - exit the interactive console\n";
-            std::cout << "\trules\t\t - print all the available rules\n";
-            std::cout << "\tgoals\t\t - print the remaining goals\n";
-            std::cout << "\trevert\t\t - revert to the state before the last rule was applied\n";
-            std::cout << "\tclear\t\t - clear the screen\n";
-            std::cout << "\tapply RULE\t - apply the rule RULE on the first goal" << std::endl;
+            std::cout << "\thelp\t\t\t - print this help\n";
+            std::cout << "\texit\t\t\t - exit the interactive console\n";
+            std::cout << "\trules\t\t\t - print all the available rules\n";
+            std::cout << "\tgoals\t\t\t - print the remaining goals\n";
+            std::cout << "\trevert\t\t\t - revert to the state before the last rule was applied\n";
+            std::cout << "\tclear\t\t\t - clear the screen\n";
+            std::cout << "\tapply RULE [\"TERM\"]\t - apply the rule RULE with an optional TERM substitution\n";
+            std::cout << "\t\t\t\t   on the first goal" << std::endl;
         }
         else if (command == "exit") {
             return "EXIT";
@@ -106,9 +115,9 @@ std::string ITP::get_rule_from_user() {
             std::cout << "\tiffE\t\t - equivalence elimination\n\n";
 
             std::cout << "\tallI\t\t - universal quantifier introduction\n";
-            std::cout << "\tallE\t\t - universal quantifier elimination\n\n";
+            std::cout << "\tallE\t\t - universal quantifier elimination, requires a term for substitution\n\n";
 
-            std::cout << "\texI\t\t - existential quantifier introduction\n";
+            std::cout << "\texI\t\t - existential quantifier introduction, requires a term for substitution\n";
             std::cout << "\texE\t\t - existential quantifier elimination\n\n";
 
             std::cout << "\tassumption\t - use the assumption on the left-hand side" << std::endl;
@@ -123,9 +132,20 @@ std::string ITP::get_rule_from_user() {
             clear_screen();
         }
         else if (command == "apply") {
-            std::string rule;
+            std::string rule, term;
             iss >> rule;
-            return rule;
+
+            if (rule != "allE" && rule != "exI") {
+                return rule;
+            }
+
+            std::getline(iss >> std::ws, term);
+            if (parse_term_string(term) == 0) {
+                return rule;
+            }
+
+            std::cout << "\nFaileld to parse the required term for the rule " << rule << ".\n";
+            std::cout << "\tUsage: apply " << rule << " \"TERM\"" << std::endl;
         }
         else if (command != "") {
             std::cout << "\tCommand unknown. Run 'help' for instructions." << std::endl;

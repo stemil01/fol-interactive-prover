@@ -4,7 +4,7 @@
 #include "nd.hpp"
 #include "fol.hpp"
 
-std::vector<Goal> ND::apply_rule(const std::string rule, const Goal &goal) {
+std::vector<Goal> ND::apply_rule(const std::string rule, const Goal &goal, const TermPtr &term) {
     if (rule == "notI") {
         return notI(goal);
     }
@@ -48,10 +48,10 @@ std::vector<Goal> ND::apply_rule(const std::string rule, const Goal &goal) {
         return allI(goal);
     }
     else if (rule == "allE") {
-        return allE(goal);
+        return allE(goal, term);
     }
     else if (rule == "exI") {
-        return exI(goal);
+        return exI(goal, term);
     }
     else if (rule == "exE") {
         return exE(goal);
@@ -407,12 +407,52 @@ std::vector<Goal> ND::allI(const Goal &goal) {
     return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
-std::vector<Goal> ND::allE(const Goal &goal) {
-    return {goal};
+std::vector<Goal> ND::allE(const Goal &goal, const TermPtr &term) {
+    std::set<FormulaPtr> lhs = goal.get_lhs();
+
+    // We search for the first occurence of a universally quantified formula
+    // on the left hand side of the current goal. However, this
+    // is not always sufficient, and the user should be able to
+    // specify the universally quantified formula in the general case.
+    FormulaPtr all_formula;
+    bool found_all = false;
+    for (auto it = lhs.begin(); !found_all && it != lhs.end(); it++) {
+        if (is<Quantifier>(*it) && as<Quantifier>(*it).type == Quantifier::All) {
+            all_formula = *it;
+            found_all = true;
+        }
+    }
+    if (!found_all) {
+        throw std::runtime_error("Failed to apply rule allE.");
+    }
+
+    Quantifier quant = as<Quantifier>(all_formula);
+
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
+    lhs.erase(all_formula);
+    lhs.insert(substitute(quant.subformula, quant.var, term));
+    FormulaPtr rhs = goal.get_rhs();
+
+    return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
-std::vector<Goal> ND::exI(const Goal &goal) {
-    return {goal};
+std::vector<Goal> ND::exI(const Goal &goal, const TermPtr &term) {
+    FormulaPtr rhs = goal.get_rhs();
+
+    if (!is<Quantifier>(rhs)) {
+        throw std::runtime_error("Failed to apply rule exI.");
+    }
+
+    Quantifier exists = as<Quantifier>(rhs);
+    if (exists.type != Quantifier::Exists) {
+        throw std::runtime_error("Failed to apply rule exI.");
+    }
+
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
+    std::set<FormulaPtr> lhs = goal.get_lhs();
+    rhs = substitute(exists.subformula, exists.var, term);
+
+    return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
 std::vector<Goal> ND::exE(const Goal &goal) {

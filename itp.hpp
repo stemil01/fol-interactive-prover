@@ -6,6 +6,8 @@
 
 #include "fol.hpp"
 
+extern int parse_term_string(const std::string &);
+
 class Goal;
 
 // ITP - Interactive Theorem Prover
@@ -16,7 +18,7 @@ public:
     static void print_goals(std::stack<Goal> goals);
 
 private:
-    static std::string get_rule_from_user();
+    static std::string get_command_from_user();
     static void clear_screen();
 };
 

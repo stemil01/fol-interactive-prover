@@ -1,10 +1,11 @@
+%define api.prefix {formula}
 
 %{
 #include <iostream>
 
-extern int yylex();
+extern int formulalex();
 
-#define yyerror printf
+#define formulaerror printf
 
 #include "fol.hpp"
 
@@ -47,9 +48,9 @@ extern FormulaPtr input_formula;
 %%
 
 input
-	: formula '\n' {
-		input_formula = *$1;
-		delete $1;
+	: '"' formula '"' {
+		input_formula = *$2;
+		delete $2;
 		return 0;
 	}
 	;

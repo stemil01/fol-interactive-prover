@@ -1,0 +1,69 @@
+%define api.prefix {term}
+
+%{
+#include <iostream>
+
+extern int termlex();
+
+#define termerror printf
+
+#include "fol.hpp"
+
+extern TermPtr input_term;
+
+%}
+
+%union {
+	std::string *str_attr;
+	TermPtr *term_attr;
+	std::vector<TermPtr> *term_seq_attr;
+}
+
+%token<str_attr> SYMBOL;
+%token<str_attr> VARIABLE;
+
+%type<term_attr> term
+%type<term_seq_attr> term_seq
+
+%%
+
+input
+	: '"' term '"' {
+		input_term = *$2;
+		delete $2;
+		return 0;
+	}
+	;
+
+term_seq
+	: term_seq ',' term {
+		$1->push_back(*$3);
+		$$ = $1;
+		delete $3;
+	}
+	| term {
+		$$ = new std::vector<TermPtr>({*$1});
+		delete $1;
+	}
+	;
+
+term
+	: VARIABLE {
+		TermPtr formula = ptr(Variable{*$1});
+		$$ = new TermPtr(formula);
+		delete $1;
+	}
+	| SYMBOL {
+		TermPtr formula = ptr(Function{*$1, {}});
+		$$ = new TermPtr(formula);
+		delete $1;
+	}
+	| SYMBOL '(' term_seq ')' {
+		TermPtr formula = ptr(Function{*$1, *$3});
+		$$ = new TermPtr(formula);
+		delete $1;
+		delete $3;
+	}
+	;
+
+%%

@@ -156,6 +156,7 @@ bool operator!=(const FormulaPtr &p, const FormulaPtr &q);
 void print(std::ostream &os, const TermPtr& term);
 void print(std::ostream &os, const FormulaPtr& formula);
 
+std::ostream &operator<<(std::ostream &os, const TermPtr &term);
 std::ostream &operator<<(std::ostream &os, const FormulaPtr &formula);
 
 #endif //FOL_HPP

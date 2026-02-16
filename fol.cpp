@@ -427,6 +427,11 @@ void print(std::ostream &os, const FormulaPtr& formula) {
     }
 }
 
+std::ostream &operator<<(std::ostream &os, const TermPtr &term) {
+    print(os, term);
+    return os;
+}
+
 std::ostream &operator<<(std::ostream &os, const FormulaPtr &formula) {
     print(os, formula);
     return os;

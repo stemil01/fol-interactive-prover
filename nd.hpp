@@ -7,7 +7,7 @@
 // Class representing Natural Deduction (ND) rules
 class ND {
 public:
-    static std::vector<Goal> apply_rule(const std::string rule, const Goal &goal);
+    static std::vector<Goal> apply_rule(const std::string rule, const Goal &goal, const TermPtr &term);
 
 private:
     static std::vector<Goal> notI(const Goal &goal);
@@ -29,9 +29,9 @@ private:
     static std::vector<Goal> iffE(const Goal &goal);
 
     static std::vector<Goal> allI(const Goal &goal);
-    static std::vector<Goal> allE(const Goal &goal);
+    static std::vector<Goal> allE(const Goal &goal, const TermPtr &term);
 
-    static std::vector<Goal> exI(const Goal &goal);
+    static std::vector<Goal> exI(const Goal &goal, const TermPtr &term);
     static std::vector<Goal> exE(const Goal &goal);
 
     static std::vector<Goal> assumption(const Goal &goal);

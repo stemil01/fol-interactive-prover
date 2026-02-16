@@ -1,18 +1,18 @@
 #include "fol.hpp"
 #include "itp.hpp"
 
-extern int yyparse();
-extern int yylex_destroy();
+extern int formulaparse();
+extern int formulalex_destroy();
 
 FormulaPtr input_formula = nullptr;
 
 int main() {
     std::cout << "Formula: ";
-    if (yyparse() == 0) {
+    if (formulaparse() == 0) {
         ITP::interactive_proof(input_formula);
     }
 
-    yylex_destroy();
+    formulalex_destroy();
 
     return 0;
 }
