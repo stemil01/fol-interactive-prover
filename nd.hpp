@@ -14,6 +14,7 @@ private:
     static std::vector<Goal> notE(const Goal &goal);
 
     static std::vector<Goal> conjI(const Goal &goal);
+    static std::vector<Goal> conjE(const Goal &goal);
     static std::vector<Goal> conjunct1(const Goal &goal);
     static std::vector<Goal> conjunct2(const Goal &goal);
 

@@ -47,7 +47,7 @@ void ITP::interactive_proof(FormulaPtr formula) {
         }
     }
 
-    std::cout << "All goals resolved. The formula is proved!" << std::endl;
+    std::cout << "All goals resolved.\nProof complete." << std::endl;
 }
 
 void ITP::print_goals(std::stack<Goal> goals) {
@@ -79,7 +79,6 @@ std::string ITP::get_rule_from_user() {
             std::cout << "\trules\t\t - prints all the available rules\n";
             std::cout << "\tgoals\t\t - print the remaining goals\n";
             std::cout << "\trevert\t\t - revert the last appled rule\n";
-            std::cout << "\tdone\t\t - exit if all goals are met\n";
             std::cout << "\tclear\t\t - clear the screen\n";
             std::cout << "\tapply RULE\t - apply the rule RULE on the first goal" << std::endl;
         }
@@ -88,6 +87,7 @@ std::string ITP::get_rule_from_user() {
             std::cout << "\tnotE\t\t - negation elimination\n\n";
 
             std::cout << "\tconjI\t\t - conjunction introduction\n";
+            std::cout << "\tconjE\t\t - conjunction elimination\n";
             std::cout << "\tconjunct1\t - conjunction elimination on the first conjunct\n";
             std::cout << "\tconjunct2\t - conjunction elimination on the second conjunct\n\n";
 
@@ -114,9 +114,6 @@ std::string ITP::get_rule_from_user() {
         }
         else if (command == "revert") {
             return "REVERT";
-        }
-        else if (command == "done") {
-            std::cout << "done case" << std::endl;
         }
         else if (command == "clear") {
             clear_screen();

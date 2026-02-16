@@ -14,6 +14,9 @@ std::vector<Goal> ND::apply_rule(const std::string rule, const Goal &goal) {
     else if (rule == "conjI") {
         return conjI(goal);
     }
+    else if (rule == "conjE") {
+        return conjE(goal);
+    }
     else if (rule == "conjunct1") {
         return conjunct1(goal);
     }
@@ -128,6 +131,36 @@ std::vector<Goal> ND::conjI(const Goal &goal) {
         {Goal{free_variables, lhs, bin.r}}
     };
 }
+
+std::vector<Goal> ND::conjE(const Goal &goal) {
+    std::set<FormulaPtr> lhs = goal.get_lhs();
+
+    // We search for the first occurence of a implication formula
+    // on the left hand side of the current goal. However, this
+    // is not always sufficient, and the user should be able to
+    // specify the implication formula in the general case.
+    FormulaPtr conj_formula;
+    bool found_conj = false;
+    for (auto it = lhs.begin(); !found_conj && it != lhs.end(); it++) {
+        if (is<Binary>(*it) && as<Binary>(*it).type == Binary::And) {
+            conj_formula = *it;
+            found_conj = true;
+        }
+    }
+    if (!found_conj) {
+        throw std::runtime_error("Failed to apply rule conjE.");
+    }
+
+    std::set<Variable> free_variables = goal.get_free_variables();
+
+    lhs.erase(conj_formula);
+    lhs.insert(as<Binary>(conj_formula).l);
+    lhs.insert(as<Binary>(conj_formula).r);
+    FormulaPtr rhs = goal.get_rhs();
+
+    return {Goal{free_variables, lhs, rhs}};
+}
+
 
 std::vector<Goal> ND::conjunct1(const Goal &goal) {
     std::set<FormulaPtr> lhs = goal.get_lhs();
