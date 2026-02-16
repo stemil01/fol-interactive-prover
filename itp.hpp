@@ -24,16 +24,16 @@ private:
 class Goal {
 public:
     Goal();
-    Goal(const std::set<Variable> &free_variables, const std::set<FormulaPtr> &lhs, FormulaPtr rhs);
+    Goal(const std::set<std::string> &arbitrary_vars, const std::set<FormulaPtr> &lhs, FormulaPtr rhs);
 
-    std::set<Variable> get_free_variables() const;
+    std::set<std::string> get_arbitrary_vars() const;
     std::set<FormulaPtr> get_lhs() const;
     FormulaPtr get_rhs() const;
 
     void print(std::ostream &os) const;
 
 private:
-    std::set<Variable> m_free_variables;
+    std::set<std::string> m_arbitrary_vars;
     std::set<FormulaPtr> m_lhs;
     FormulaPtr m_rhs;
 };

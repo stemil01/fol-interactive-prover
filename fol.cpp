@@ -217,11 +217,11 @@ std::string uniqueVar(const FormulaPtr& formula, const TermPtr& term) {
     std::set<std::string> termVars;
     getVariables(term, termVars);
 
-    // Generisemo u1, u2, u3, ... dok ne nadjemo promenljivu koja se nigde ne pojavljuje
+    // Generisemo U1, U2, U3, ... dok ne nadjemo promenljivu koja se nigde ne pojavljuje
     static unsigned uniqueCounter = 0;
     std::string var;
     do {
-        var = "u" + std::to_string(++uniqueCounter);
+        var = "U" + std::to_string(++uniqueCounter);
     } while(formulaVars.contains(var) || termVars.contains(var));
     return var;
 }

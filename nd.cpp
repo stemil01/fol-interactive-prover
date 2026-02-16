@@ -71,13 +71,13 @@ std::vector<Goal> ND::notI(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule notI.");
     }
 
-    std::set<Variable> free_variables = goal.get_free_variables();
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
     std::set<FormulaPtr> lhs = goal.get_lhs();
     FormulaPtr subformula = as<Not>(rhs).subformula;
     lhs.insert(subformula);
     rhs = falseConst();
 
-    return {Goal{free_variables, lhs, rhs}};
+    return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
 std::vector<Goal> ND::notE(const Goal &goal) {
@@ -104,11 +104,11 @@ std::vector<Goal> ND::notE(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule notE.");
     }
 
-    std::set<Variable> free_variables = goal.get_free_variables();
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
     lhs.erase(not_formula);
     rhs = as<Not>(not_formula).subformula;
 
-    return {Goal{free_variables, lhs, rhs}};
+    return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
 std::vector<Goal> ND::conjI(const Goal &goal) {
@@ -123,12 +123,12 @@ std::vector<Goal> ND::conjI(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule conjI.");
     }
 
-    std::set<Variable> free_variables = goal.get_free_variables();
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
     std::set<FormulaPtr> lhs = goal.get_lhs();
 
     return {
-        {Goal{free_variables, lhs, bin.l}},
-        {Goal{free_variables, lhs, bin.r}}
+        {Goal{arbitrary_vars, lhs, bin.l}},
+        {Goal{arbitrary_vars, lhs, bin.r}}
     };
 }
 
@@ -151,14 +151,14 @@ std::vector<Goal> ND::conjE(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule conjE.");
     }
 
-    std::set<Variable> free_variables = goal.get_free_variables();
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
 
     lhs.erase(conj_formula);
     lhs.insert(as<Binary>(conj_formula).l);
     lhs.insert(as<Binary>(conj_formula).r);
     FormulaPtr rhs = goal.get_rhs();
 
-    return {Goal{free_variables, lhs, rhs}};
+    return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
 
@@ -181,12 +181,12 @@ std::vector<Goal> ND::conjunct1(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule conjunct1.");
     }
 
-    std::set<Variable> free_variables = goal.get_free_variables();
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
     lhs.erase(conj_formula);
     lhs.insert(as<Binary>(conj_formula).l);
     FormulaPtr rhs = goal.get_rhs();
 
-    return {Goal{free_variables, lhs, rhs}};
+    return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
 std::vector<Goal> ND::conjunct2(const Goal &goal) {
@@ -208,12 +208,12 @@ std::vector<Goal> ND::conjunct2(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule conjunct2.");
     }
 
-    std::set<Variable> free_variables = goal.get_free_variables();
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
     lhs.erase(conj_formula);
     lhs.insert(as<Binary>(conj_formula).r);
     FormulaPtr rhs = goal.get_rhs();
 
-    return {Goal{free_variables, lhs, rhs}};
+    return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
 std::vector<Goal> ND::disjI1(const Goal &goal) {
@@ -228,10 +228,10 @@ std::vector<Goal> ND::disjI1(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule disjI1.");
     }
 
-    std::set<Variable> free_variables = goal.get_free_variables();
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
     std::set<FormulaPtr> lhs = goal.get_lhs();
 
-    return {Goal{free_variables, lhs, bin.l}};
+    return {Goal{arbitrary_vars, lhs, bin.l}};
 }
 
 std::vector<Goal> ND::disjI2(const Goal &goal) {
@@ -246,10 +246,10 @@ std::vector<Goal> ND::disjI2(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule disjI2.");
     }
 
-    std::set<Variable> free_variables = goal.get_free_variables();
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
     std::set<FormulaPtr> lhs = goal.get_lhs();
 
-    return {Goal{free_variables, lhs, bin.r}};
+    return {Goal{arbitrary_vars, lhs, bin.r}};
 }
 
 std::vector<Goal> ND::disjE(const Goal &goal) {
@@ -271,7 +271,7 @@ std::vector<Goal> ND::disjE(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule disjE.");
     }
 
-    std::set<Variable> free_variables = goal.get_free_variables();
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
     lhs.erase(disj_formula);
     std::set<FormulaPtr> lhs_l = lhs;
     lhs_l.insert(as<Binary>(disj_formula).l);
@@ -280,8 +280,8 @@ std::vector<Goal> ND::disjE(const Goal &goal) {
     FormulaPtr rhs = goal.get_rhs();
 
     return {
-        Goal{free_variables, lhs_l, rhs},
-        Goal{free_variables, lhs_r, rhs}
+        Goal{arbitrary_vars, lhs_l, rhs},
+        Goal{arbitrary_vars, lhs_r, rhs}
     };
 }
 
@@ -297,12 +297,12 @@ std::vector<Goal> ND::impI(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule impI.");
     }
 
-    std::set<Variable> free_variables = goal.get_free_variables();
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
     std::set<FormulaPtr> lhs = goal.get_lhs();
     lhs.insert(impl.l);
     rhs = impl.r;
 
-    return {Goal{free_variables, lhs, rhs}};
+    return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
 std::vector<Goal> ND::impE(const Goal &goal) {
@@ -325,11 +325,11 @@ std::vector<Goal> ND::impE(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule impE.");
     }
 
-    std::set<Variable> free_variables = goal.get_free_variables();
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
     lhs.erase(impl_formula);
     rhs = as<Binary>(impl_formula).l;
 
-    return {Goal{free_variables, lhs, rhs}};
+    return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
 std::vector<Goal> ND::iffI(const Goal &goal) {
@@ -344,15 +344,15 @@ std::vector<Goal> ND::iffI(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule iffI.");
     }
 
-    std::set<Variable> free_variables = goal.get_free_variables();
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
     std::set<FormulaPtr> lhs = goal.get_lhs();
 
     FormulaPtr rhs1 = ptr(Binary{Binary::Impl, equiv.l, equiv.r});
     FormulaPtr rhs2 = ptr(Binary{Binary::Impl, equiv.r, equiv.l});
 
     return {
-        Goal{free_variables, lhs, rhs1},
-        Goal{free_variables, lhs, rhs2}
+        Goal{arbitrary_vars, lhs, rhs1},
+        Goal{arbitrary_vars, lhs, rhs2}
     };
 }
 
@@ -375,7 +375,7 @@ std::vector<Goal> ND::iffE(const Goal &goal) {
         throw std::runtime_error("Failed to apply rule iffE.");
     }
 
-    std::set<Variable> free_variables = goal.get_free_variables();
+    std::set<std::string> arbitrary_vars = goal.get_arbitrary_vars();
 
     Binary bin = as<Binary>(equiv_formula);
     lhs.erase(equiv_formula);
@@ -383,10 +383,21 @@ std::vector<Goal> ND::iffE(const Goal &goal) {
     lhs.insert(ptr(Binary{Binary::Impl, bin.r, bin.l}));
     FormulaPtr rhs = goal.get_rhs();
 
-    return {Goal{free_variables, lhs, rhs}};
+    return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
 std::vector<Goal> ND::allI(const Goal &goal) {
+    FormulaPtr rhs = goal.get_rhs();
+
+    if (!is<Quantifier>(rhs)) {
+        throw std::runtime_error("Failed to apply rule allI.");
+    }
+
+    Quantifier all = as<Quantifier>(rhs);
+    if (all.type != Quantifier::All) {
+        throw std::runtime_error("Failed to apply rule allI.");
+    }
+
     return {goal};
 }
 

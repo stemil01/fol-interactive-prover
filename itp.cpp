@@ -11,7 +11,7 @@
 void ITP::interactive_proof(FormulaPtr formula) {
     std::stack<Goal> goals;
     std::stack<GoalDiff> diffs;
-    goals.push(Goal(std::set<Variable>(), std::set<FormulaPtr>(), formula));
+    goals.push(Goal(std::set<std::string>(), std::set<FormulaPtr>(), formula));
     print_goals(goals);
 
     while (!goals.empty()) {
@@ -136,11 +136,11 @@ void ITP::clear_screen() {
 
 Goal::Goal() {}
 
-Goal::Goal(const std::set<Variable> &free_variables, const std::set<FormulaPtr> &lhs, FormulaPtr rhs)
-    : m_free_variables(free_variables), m_lhs(lhs), m_rhs(rhs) {}
+Goal::Goal(const std::set<std::string> &arbitrary_vars, const std::set<FormulaPtr> &lhs, FormulaPtr rhs)
+    : m_arbitrary_vars(arbitrary_vars), m_lhs(lhs), m_rhs(rhs) {}
 
-std::set<Variable> Goal::get_free_variables() const {
-    return m_free_variables;
+std::set<std::string> Goal::get_arbitrary_vars() const {
+    return m_arbitrary_vars;
 }
 
 std::set<FormulaPtr> Goal::get_lhs() const {
@@ -152,11 +152,11 @@ FormulaPtr Goal::get_rhs() const {
 }
 
 void Goal::print(std::ostream &os) const {
-    auto fv_it = m_free_variables.begin();
-    while (fv_it != m_free_variables.end()) {
-        os << fv_it->name;
+    auto fv_it = m_arbitrary_vars.begin();
+    while (fv_it != m_arbitrary_vars.end()) {
+        os << *fv_it;
         fv_it++;
-        if (fv_it != m_free_variables.end()) {
+        if (fv_it != m_arbitrary_vars.end()) {
             os << " ";
         }
     }
