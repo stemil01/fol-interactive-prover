@@ -20,6 +20,12 @@
 \theoremstyle{remark}
 \newtheorem{example}{Primer}[section]
 
+% inference rules
+\usepackage{mathpartir}
+
+% proof trees
+\usepackage{bussproofs}
+
 % misc
 \usepackage{enumitem}
 
@@ -243,7 +249,205 @@ promenljive termom u formuli prvog reda.
 
 \subsection{Prirodna dedukcija}
 
-Prirodna dedukcija i pravila prirodne dedukcije.
+Razvijeno je više različitih deduktivnih sistema za logiku prvog reda.
+Među najpoznatijiima su Hilbertov sistem \cite{hilbert1999principles}, prirodna
+dedukcija \cite{gentzen1935untersuchungen} i račun sekvenata
+\cite{gentzen1935untersuchungen}.
+U nastavku se posvećujemo prirodnoj dedukciji kao sistemu koji teži da bude što
+sličnjiji ljudskom načinu dokazivanja matematičkih tvrđenja.
+
+Pravila prirodne dedukcije ćemo zapisivati pomoću sekvenata.
+Sekvent je izraz oblike $\Gamma \vdash \phi$, gde je $\Gamma$ skup formula
+prvog reda, a $\phi$ formula prvog reda.
+Sekvent tumačimo kao da skup formula iz $\Gamma$ dokazuje formulu $\phi$.
+Pravila ćemo zapisivati u Gencenovoj notaciji koja iznad horizontalne linije
+sadrži sekvente koje pretpostavljamo da važe, a ispod se nalazi sekvent koji
+važi pod pretpostavkama iznad.
+Na primer, pravilo
+\begin{mathpar}
+    \inferrule*
+    {\Gamma \vdash A \\ \Gamma \vdash B}
+    {\Gamma \vdash A \land B}
+\end{mathpar}
+znači da ako važe sekventi $\Gamma \vdash A$ i $\Gamma \vdash B$, onda važi i
+sekvent $\Gamma \vdash A \land B$.
+
+Skup svih pravila je dat na slici \ref{fig:inf-rules}.
+Pravila se mogu grupisati u dve kategorije: pravila uvođenja i pravila
+eliminacije.
+Na slici \ref{fig:inf-rules}, imena pravila uvođenja se završavaju sa $I$,
+a pravila eliminacije sa $E$.
+Razlika među njima je što pravila uvođenja uvode odgovajući logički simbol na
+desnu, dok pravila eliminacije uvode odgovarajući simbol na
+levu stranu sekventa.
+Na primer, pravilo \textsc{conjI} u sekventima u pretpostavkama nema konjunkciju
+sa desne strane, dok se u sekventu u zaključku ona pojavljuje sa desne strane.
+Sa druge strane, u pravilu \textsc{conjE} situacija je suprotna i u sekvektu u
+zaključku se pojavljuje konjukncija na levoj strani.
+
+Pravila \textsc{allI} i \textsc{exE} imaju dodatni uslov da se promenljiva $y$
+ne pojavljuje slobodno ni u $\Gamma$ ni u $A$.
+
+\begin{figure}[ht]
+    \centering
+    \textbf{Negacija}
+    \begin{mathpar}
+        \inferrule*[right=notI]
+        {\Gamma, A \vdash \bot}
+        {\Gamma \vdash \neg A}
+
+        \inferrule*[right=notE]
+        {\Gamma \vdash A}
+        {\Gamma, \neg A \vdash \bot}
+    \end{mathpar}
+    \textbf{Konjunkcija}
+    \begin{mathpar}
+        \inferrule*[right=conjI]
+        {\Gamma \vdash A \\ \Gamma \vdash B}
+        {\Gamma \vdash A \land B}
+
+        \inferrule*[right=conjE]
+        {\Gamma, A, B \vdash C}
+        {\Gamma, A \land B \vdash C}
+
+        \inferrule*[right=conjunct1]
+        {\Gamma, A \vdash C}
+        {\Gamma, A \land B \vdash C}
+
+        \inferrule*[right=conjunct2]
+        {\Gamma, B \vdash C}
+        {\Gamma, A \land B \vdash C}
+    \end{mathpar}
+    \textbf{Disjunkcija}
+    \begin{mathpar}
+        \inferrule*[right=disjI1]
+        {\Gamma \vdash A}
+        {\Gamma \vdash A \lor B}
+
+        \inferrule*[right=disjI2]
+        {\Gamma \vdash B}
+        {\Gamma \vdash A \lor B}
+
+        \inferrule*[right=disjE]
+        {\Gamma, A \vdash C \\ \Gamma, B \vdash C}
+        {\Gamma, A \lor B \vdash C}
+    \end{mathpar}
+    \textbf{Implikacija}
+    \begin{mathpar}
+        \inferrule*[right=impI]
+        {\Gamma, A \vdash B}
+        {\Gamma \vdash A \rightarrow B}
+
+        \inferrule*[right=impE]
+        {\Gamma \vdash A}
+        {\Gamma, A \rightarrow B \vdash B}
+    \end{mathpar}
+    \textbf{Ekvivalencija}
+    \begin{mathpar}
+        \inferrule*[right=iffI]
+        {\Gamma \vdash A \rightarrow B \\ \Gamma \vdash B \rightarrow A}
+        {\Gamma \vdash A \leftrightarrow B}
+
+        \inferrule*[right=iffE]
+        {\Gamma, A \rightarrow B, B \rightarrow A \vdash C}
+        {\Gamma, A \leftrightarrow B \vdash C}
+    \end{mathpar}
+    \textbf{Univerzalni kvantifikator}
+    \begin{mathpar}
+        \inferrule*[right=allI]
+        {\Gamma \vdash A[x \mapsto y]}
+        {\Gamma \vdash \forall x. A}
+
+        \inferrule*[right=allE]
+        {\Gamma, A[x \mapsto t] \vdash C}
+        {\Gamma, \forall x. A \vdash C}
+    \end{mathpar}
+    \textbf{Egzistencijalni kvantifikator}
+    \begin{mathpar}
+        \inferrule*[right=exI]
+        {\Gamma \vdash A[x \mapsto y]}
+        {\Gamma \vdash \exists x. A}
+
+        \inferrule*[right=exE]
+        {\Gamma, A[x \mapsto y] \vdash C}
+        {\Gamma, \exists x. A \vdash C}
+    \end{mathpar}
+    \textbf{Pretpostavka}
+    \begin{mathpar}
+        \inferrule*[right=assumption]
+        {\\}
+        {\Gamma, A \vdash A}
+    \end{mathpar}
+\caption{Pravila prirodne dedukcije}
+\label{fig:inf-rules}
+\end{figure}
+
+\begin{definition}
+Dokaz u prirodnoj dedukciji je konačan niz sekvenata takvih da je svaki naredni
+dobijen primenom nekog od pravila sa slike \ref{fig:inf-rules} na ranije
+sekvente.
+
+Za formulu $F$ logike prvog reda ćemo reći da je dokaziva u prirodnoj dedukciji
+ukoliko postoji dokaz koji se završava sekventom $\vdash F$.
+\end{definition}
+
+\begin{example}
+    Formula $\neg (\exists x. p(x) \lor q(x))
+    \rightarrow (\forall x. \neg p(x) \land \neg q(x))$ je dokaziva.
+    Dokazi u prirodnoj dedukciji se često prikazuju pomoću stabla, i dokaz
+    za ovu formulu može da izgleda ovako:
+
+    \begin{prooftree}
+        \AxiomC{}
+        \RightLabel{\textsc{assumption}}
+        \UnaryInfC{$p(x) \vdash p(x)$}
+
+        \RightLabel{\textsc{disjI1}}
+        \UnaryInfC{$p(x) \vdash p(x) \lor q(x)$}
+
+        \RightLabel{\textsc{exI}}
+        \UnaryInfC{$p(x) \vdash \exists x. p(x) \lor q(x)$}
+
+        \RightLabel{\textsc{notE}}
+        \UnaryInfC{$p(x), \neg (\exists x. p(x) \lor q(x)) \vdash \bot$}
+
+        \RightLabel{\textsc{notI}}
+        \UnaryInfC{$\neg (\exists x. p(x) \lor q(x)) \vdash \neg p(x)$}
+
+        \AxiomC{}
+        \RightLabel{\textsc{assumption}}
+        \UnaryInfC{$q(x) \vdash q(x)$}
+
+        \RightLabel{\textsc{disjI1}}
+        \UnaryInfC{$q(x) \vdash p(x) \lor q(x)$}
+
+        \RightLabel{\textsc{exI}}
+        \UnaryInfC{$q(x) \vdash \exists x. p(x) \lor q(x)$}
+
+        \RightLabel{\textsc{notE}}
+        \UnaryInfC{$q(x), \neg (\exists x. p(x) \lor q(x)) \vdash \bot$}
+
+        \RightLabel{\textsc{notI}}
+        \UnaryInfC{$\neg (\exists x. p(x) \lor q(x)) \vdash \neg q(x)$}
+
+        \RightLabel{\textsc{conjI}}
+        \BinaryInfC{
+            $\neg (\exists x. p(x) \lor q(x)) \vdash \neg p(x) \land \neg q(x)$
+        }
+
+        \RightLabel{\textsc{allI}}
+        \UnaryInfC{
+            $\neg (\exists x. p(x) \lor q(x))
+            \vdash \forall x. \neg p(x) \land \neg q(x)$
+        }
+
+        \RightLabel{\textsc{impI}}
+        \UnaryInfC{
+            $\vdash \neg (\exists x. p(x) \lor q(x))
+            \rightarrow (\forall x. \neg p(x) \land \neg q(x))$
+        }
+    \end{prooftree}
+\end{example}
 
 \section{Opis metode}
 \label{sec:opis_metode}
