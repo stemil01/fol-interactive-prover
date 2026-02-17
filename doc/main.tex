@@ -4,10 +4,24 @@
 \usepackage[serbian]{babel}
 \usepackage{hyperref}
 
+% mathematics
+\usepackage{amssymb}
+\usepackage{amsthm}
+
 % bibliography
 \usepackage[backend=biber]{biblatex}
 \addbibresource{refs.bib}
 
+% definitions, theorems, and proofs
+\newtheorem{definition}{Definicija}[section]
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{corollary}{Posledica}[theorem]
+\newtheorem{lemma}[theorem]{Lema}
+\theoremstyle{remark}
+\newtheorem{example}{Primer}[section]
+
+% misc
+\usepackage{enumitem}
 
 %opening
 \title{Interaktivni dokazivač u prirodnoj dedukciji za logiku prvog reda}
@@ -65,7 +79,171 @@ metodu opisanu u radu.
 \section{Osnove}
 \label{sec:osnove}
 
-Poglavlje ,,Osnove'' treba da sadr\v zi osnovne definicije i notaciju koja \' ce biti kori\v s\' cena u ostatku rada. Na primer, ako je tema ,,Metod tabloa u iskaznoj logici'', potrebno je uvesti ukratko sintaksu i semantiku iskazne logike, definisati pojam zadovoljivosti i tautologi\v cnosti, kao i SAT problem.
+U ovom poglavlju dajemo uvodimo i dajemo formalan opis sintakse logike prvog
+reda i prirodno dedukcije u njoj.
+
+\subsection{Sintaksa logike prvog reda}
+
+Logika prvog reda (ili predikatska logika) je značajno ekspresivnija od iskazne
+logike i proširuje njenu sitaksnu.
+Jezik nad kojim se logika prvog reda definiše se sastoji od logičkih dela tj.
+logičkih simbola i \textit{signature} \cite{janicic2008mlur}.
+
+\begin{definition}
+    Logički deo jezika prvog reda čine skupovi:
+    \begin{enumerate}
+        \item prebrojiv skup promenljivih $V$
+        \item skupa logičkih veznika
+        $\{\neg, \land, \lor, \rightarrow, \leftrightarrow\}$
+        \item skupa kvantifikatora $\{\forall, \exists\}$
+        \item skupa logičkih konstanti $\{\top, \bot\}$
+        \item skupa pomoćnih simbola $\{(, ), ,\}$.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}
+    Signatura (ili jezik) $\mathcal{L} = (\Sigma, \Pi, \mathrm{ar})$ je uređena
+    trojka koju određuje skup funkcijskih simbola $\Sigma$, skup relacijskih
+    (predikatskih) simbola $\Pi$ i funkcija arnosti
+    $\mathrm{ar} : \left(\Sigma \cup \Pi\right) \to \mathbb{N}$.
+\end{definition}
+
+Reči nad signaturom $\mathcal{L}$ su bilo koji nizovi karaktera koji se sastoje
+iz skupa logičkih simbola i skupova $\Sigma$ i $\Pi$.
+Ipak, ograničavaćemo se samo na određeni podskup ovog jezika koji ćemo
+koristiti za sintaksu logike prvog reda.
+
+\begin{definition}
+    Skup termova nad signaturom $\mathcal{L}$ je najmanji skup za koji važi:
+    \begin{enumerate}
+        \item sve promenljive iz skupa $V$ su termovi
+        \item ako je $f \in \Sigma$ funkcijski simbol arnosti $n$ i
+        $t_1, t_2, \ldots, t_n$ termovi, onda je i $f(t_1, t_2, \ldots, t_n)$
+        term.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}
+    Skup atomičkih formula nad signaturom $\mathcal{L}$ je namanji skup za koji
+    važi:
+    \begin{enumerate}
+        \item logičke konstante $\top$ i $\bot$ su atomičke formule
+        \item ako je $p \in \Pi$ predikatski simbol arnosti $n$ i
+        $t_1, t_2, \ldots, t_n$ termovi, onda je i $p(t_1, t_2, \ldots, t_n)$
+        atomička formula.
+    \end{enumerate}
+\end{definition}
+
+Sada možemo da definišemo skup formula logike prvog reda.
+
+\begin{definition}
+    Skup formula logike prvog reda nad signaturom $\mathcal{L}$ je najmanji
+    skup za koji važi:
+    \begin{enumerate}
+        \item svaka atomička formula je formula
+        \item ako je $A$ formula, onda je i $\neg A$ formula
+        \item ako su $A$ i $B$ formule, onda je su i $A \land B$, $A \lor B$,
+        $A \rightarrow B$ i $A \leftrightarrow B$ formule
+        \item ako je $A$ formula, a $x$ promenljiva, onda su i $\forall x. A$ i
+        $\exists x. A$ formule
+    \end{enumerate}
+\end{definition}
+
+\begin{example}
+    \label{ex:fol-formulae}
+    Ako nam je data signatura $\mathcal{L}$ takva da je
+    $\Sigma = \{0, \mathrm{S}\}$, $\Pi = \{\mathrm{paran}\}$, a funkcija arnosti
+    zadata sa $\mathrm{ar}(\mathrm{S}) = 1$, $\mathrm{ar}(\mathrm{paran}) = 2$ i
+    $\mathrm{ar}(0) = 0$, tada su formule
+    $$\forall x. \mathrm{paran}(x)
+    \rightarrow \mathrm{paran}(\mathrm{S}(\mathrm{S}(x))),$$
+    $$\mathrm{paran}(0),$$
+    $$\neg \mathrm{paran}(\mathrm{S}(0)),$$
+    $$\mathrm{paran}(y) \lor \neg\mathrm{paran}(y)$$
+    formule prvog reda nad signaturom $\mathcal{L}$.
+\end{example}
+
+Razlikujemo vezana i slobodna pojavljivanja promenljivih u formulama prvog
+reda.
+Intuitivno, pojavljivanje promenljive je vezano ako je ona pod dejstvom nekog
+kvantifikatora, a slobodno inače.
+
+\begin{definition}
+    Slobodna pojavljivanje promenljive u formuli prvog reda definišemo na
+    sledeći način:
+    \begin{enumerate}
+        \item sva pojavaljivanja promenljivih u atomičkim formulama su slobodna
+        \item sva slobodna pojavljivanja promenljivih u formuli $A$ su slobodna
+        i u formuli $\neg A$
+        \item sva slobodna pojavljivanja promenljivih u formulama $A$ i $B$ su
+        slobodna i u formulama $A \land B$, $A \lor B$, $A \rightarrow B$ i
+        $A \leftrightarrow B$.
+        \item sva slobodna pojavljivanja promenljivih u $A$ različitih od $x$ su
+        slobodna i u $\forall x. A$ i $\exists x. A$.
+    \end{enumerate}
+
+    Svako pojavljivanje promenljive koje nije slobodno je vezano.
+\end{definition}
+
+\begin{example}
+    U formulama iz primera \ref{ex:fol-formulae} promenljiva $x$ se pojavaljuje
+    vezano, dok se promenljiva $y$ pojavljuje slobodno.
+\end{example}
+
+Još jedan sintaksni pojam koji će nam biti važan jeste zamena (supstitucija)
+promenljive termom u formuli prvog reda.
+
+\begin{definition}
+    Term $t[x \mapsto t']$ je zamena promenljive $x$ u termu $t$ termom $t'$ ako
+    je dobijen tako što se na mesto svakog pojavljivanja promenljive $x$ u termu
+    $t$ postavi term $t'$. Preciznije:
+    \begin{enumerate}
+        \item $x[x \mapsto t'] = t'$
+        \item $y[x \mapsto t'] = y$, za $y \neq x$
+        \item $f(t_1, t_2, \dots, t_n)[x \mapsto t']
+        = f(t_1[x \mapsto t'], t_2[x \mapsto t'], \ldots, t_n[x \mapsto t'])$
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}
+    Formula $F[x \mapsto t]$ je zamena promenljive $x$ u formuli $F$ termom $t$
+    i definišemo je na sledeći način:
+    \begin{enumerate}
+        \item $\top [x \mapsto t] = \top$ i $\bot [x \mapsto t] = \bot$
+        \item $p(t_1, t_2, \dots, t_n)[x \mapsto t]
+        = p(t_1[x \mapsto t], t_2[x \mapsto t], \ldots, t_n[x \mapsto t])$, gde
+        je $p \in \Pi$
+        \item $(\neg F)[x \mapsto t] = \neg F[x \mapsto t]$
+        \item $(F \otimes G)[x \mapsto t]
+        = F[x \mapsto t] \otimes G[x \mapsto t]$, gde je
+        $\otimes \in \{\land, \lor, \rightarrow, \leftrightarrow\}$
+        \item $(Qx. F)[x \mapsto t] = Qx. F$,
+        gde je $Q \in \{\forall, \exists\}$
+        \item $(Qy. F)[x \mapsto t] = Qy. F[x \mapsto t]$, gde je
+        $Q \in \{\forall, \exists\}$, $y \neq x$ i term $t$ ne sadrži
+        pojavljivanja promenljive $y$
+        \item $(Qy. F)[x \mapsto t] = Qy'. F[y \mapsto y'][x \mapsto t]$, gde je
+        $Q \in \{\forall, \exists\}$, $y \neq x$, term $t$ sadrži pojavljivanja
+        promenljive $y$ i promenljiva $y'$ se ne pojavljuje ni u $F$ ni u $t$.
+    \end{enumerate}
+\end{definition}
+
+\begin{example}
+    Primeri zamena nad signaturom $\mathcal{L}$ iz primera \ref{ex:fol-formulae}
+    mogu biti:
+    \begin{enumerate}[label=(\arabic*)]
+        \item $\mathrm{paran}(x)[x \mapsto \mathrm{S}(\mathrm{S}(0))]
+        = \mathrm{paran}(\mathrm{S}(\mathrm{S}(0)))$
+        \item $(\exists x. \mathrm{paran}(x))[x \mapsto 0]
+        = \exists x. \mathrm{paran}(x)$
+        \item $(\exists x. \mathrm{paran}(y))[x \mapsto \mathrm{S}(y)]
+        = \exists y'. \mathrm{paran}(\mathrm{S}(y))$
+    \end{enumerate}
+\end{example}
+
+\subsection{Prirodna dedukcija}
+
+Prirodna dedukcija i pravila prirodne dedukcije.
 
 \section{Opis metode}
 \label{sec:opis_metode}

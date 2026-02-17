@@ -47,6 +47,7 @@ doc/*.swo
 doc/*.bak
 
 doc/uputstvo_seminarski.tex
+*.bbl-SAVE-ERROR
 
 # Generated PDFs
 doc/*.pdf
