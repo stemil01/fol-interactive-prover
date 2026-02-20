@@ -26,6 +26,27 @@
 % proof trees
 \usepackage{bussproofs}
 
+% pseudocode
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\newenvironment{serbianalgorithm}[1][]
+  {\begin{algorithm}[#1]
+     \selectlanguage{serbian}%
+     \floatname{algorithm}{Algoritam}%
+     \renewcommand{\algorithmicif}{\textbf{ako}}
+     \renewcommand{\algorithmicthen}{\textbf{onda}}
+     \renewcommand{\algorithmicelse}{\textbf{inače}}
+     \renewcommand{\algorithmicend}{\textbf{kraj}}
+     \renewcommand{\algorithmicfor}{\textbf{za}}
+     \renewcommand{\algorithmicwhile}{\textbf{dok}}
+     \renewcommand{\algorithmicforall}{\textbf{za sve}}
+     \renewcommand{\algorithmicdo}{\textbf{radi}}
+     \renewcommand{\algorithmicfunction}{\textbf{funkcija}}
+     \renewcommand{\algorithmicend}{\textbf{kraj}}
+     \renewcommand{\algorithmicreturn}{\textbf{vrati}}
+  }
+  {\end{algorithm}}
+
 % misc
 \usepackage{enumitem}
 
@@ -392,6 +413,7 @@ ukoliko postoji dokaz koji se završava sekventom $\vdash F$.
 \end{definition}
 
 \begin{example}
+    \label{ex:proof-tree}
     Formula $\neg (\exists x. p(x) \lor q(x))
     \rightarrow (\forall x. \neg p(x) \land \neg q(x))$ je dokaziva.
     Dokazi u prirodnoj dedukciji se često prikazuju pomoću stabla, i dokaz
@@ -452,7 +474,42 @@ ukoliko postoji dokaz koji se završava sekventom $\vdash F$.
 \section{Opis metode}
 \label{sec:opis_metode}
 
-Ovo poglavlje treba da sad\v zi detaljniji opis samog algoritma koji je implementiran u okviru seminarskog rada. Algoritam mo\v ze biti opisan re\v cima ili pseudokodom (ne detaljno, ve\' c samo na nivou strukture). Treba poseban akcenat staviti na klju\v cne delove algoritma i njihovu ulogu. Po\v zeljno je navesti i primere koji dodatno razja\v snjavaju rad algoritma.
+Interaktivni dokazivač koji se zasniva na prirodnoj dedukciji treba na početku
+da prihvati sa ulaza formulu prvog reda i da zatim očekuje od korisnika pravila
+prirodne dedukcije koja primenjuje kako ih korisnik navodi.
+
+Osnovna ideja na kojoj dokazivači rade je da se pravila prirodne dedukcije
+(slika \ref{fig:inf-rules}) primenjuju u suprotnom smeru u odnosu na to kako su
+navedena.
+Preciznije, algoritam kreće od ciljne formule koju treba dokazati i izvodi
+nove sekvente menjanjem sekvenata ispod horizontalne linije sekventima
+iznad.
+Takav pristup odgovara čitanju stabla dokaza izvodjenja u primeru
+\ref{ex:proof-tree} odozdo naviše.
+
+Opisano ponašanje se može postići održavanjem steka sekvenata koje treba
+dokazati.
+U svakom trenutku, vrh steka predstavlja sekvent koji se trenutno dokazuje.
+Inicijalno se na stek postavlja sekvent $\vdash F$, gde je $F$ ulazna formula.
+Nakon svakog pravila koje korisnik navede, dokazivač primenjuje pravilo na
+sekvent sa vrha steka i menja ga novim novim sekventima koje pravilo generiše.
+Sekvent je dokazan ukoliko stek postane prazan.
+
+\begin{serbianalgorithm}[H]
+    \caption{Interktivni dokazivač}
+    \label{alg:varijacije_u_broj}
+    \textbf{Ulaz:} Formula prvog reda $F$ \\
+    \textbf{Izlaz:} Program se završava kada se formula $F$ dokaže u prirodnoj dedukciji
+    \begin{algorithmic}[1]
+        \State $s \gets \{ \vdash F \}$
+        \While{$s$ nije prazan}
+            \State $p \gets$ pravilo sa standardnog ulaza
+            \State $c \gets$ vrh steka $s$
+            \State $c' \gets$ primeni pravilo $p$ na sekvent $c$
+            \State izbaci vrh steka $s$ i postavi sekvente $c'$ na vrh
+        \EndWhile
+    \end{algorithmic}
+\end{serbianalgorithm}
 
 \section{Implementacija}
 \label{sec:implementacija}
