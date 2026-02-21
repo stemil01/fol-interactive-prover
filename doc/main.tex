@@ -417,6 +417,16 @@ ne pojavljuje slobodno ni u $\Gamma$ ni u $A$.
         {\Gamma, A[x \mapsto y] \vdash C}
         {\Gamma, \exists x. A \vdash C}
     \end{mathpar}
+    \textbf{Logičke konstante}
+    \begin{mathpar}
+        \inferrule*[right=falseE]
+        {\\}
+        {\Gamma, \bot \vdash A}
+
+        \inferrule*[right=trueI]
+        {\\}
+        {\Gamma \vdash \top}
+    \end{mathpar}
     \textbf{Pretpostavka}
     \begin{mathpar}
         \inferrule*[right=assumption]
