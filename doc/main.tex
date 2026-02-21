@@ -1,5 +1,6 @@
 \documentclass[a4paper,10pt]{article}
 \usepackage[utf8]{inputenc}
+\usepackage{fontspec}
 %\usepackage[T2A]{fontenc}
 \usepackage[serbian]{babel}
 \usepackage{hyperref}
@@ -634,9 +635,35 @@ unese i odgovaraju term $t$.
 \section{Implementacija}
 \label{sec:implementacija}
 
-U ovom poglavlju treba dati detalje implementacije. Treba navesti u kom programskom jeziku je metoda implementirana, kako je k\^od organizovan, koje su klju\v cne funkcije/klase/metode i koja je njihova uloga.
+Kompletna implementacija dokazivača je urađena u programskom jeziku C++.
 
-Takodje je bitno dati upustvo za prevodjenje i pokretanje projekta, kao i navesti softver koji je potreban za prevodjenje i pokretanje programa (prevodilac, alati, dodatne bibiloteke i sl.).
+K\^od je organizovan na sledeći način:
+\begin{center}
+\begin{minipage}{0.9\linewidth}
+    \begin{verbatim}
+    fol-interactive-prover
+    |-- parsers
+    |   |-- formula_lexer.l
+    |   |-- formula_parser.ypp
+    |   |-- term_lexer.l
+    |   `-- term_parser.ypp
+    |-- src
+    |   |-- fol.cpp
+    |   |-- fol.hpp
+    |   |-- itp.cpp
+    |   |-- itp.hpp
+    |   |-- main.cpp
+    |   |-- nd.cpp
+    |   `-- nd.hpp
+    |-- Makefile
+    `-- README.md
+    \end{verbatim}
+\end{minipage}
+\end{center}
+
+Direktorijum \texttt{parsers} sadrži k\^od za parsiranje formule sa ulaza, kao i
+za parsiranje termova koje korisnik navodi prilikom primene pravila
+\textsc{allE} i \textsc{exI}.
 
 \section{Zaklju\v cak}
 \label{sec:zakljucak}
