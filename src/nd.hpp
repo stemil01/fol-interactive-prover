@@ -34,6 +34,9 @@ private:
     static std::vector<Goal> exI(const Goal &goal, const TermPtr &term);
     static std::vector<Goal> exE(const Goal &goal);
 
+    static std::vector<Goal> falseE(const Goal &goal);
+    static std::vector<Goal> trueI(const Goal &goal);
+
     static std::vector<Goal> assumption(const Goal &goal);
 };
 

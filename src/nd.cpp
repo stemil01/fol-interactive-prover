@@ -56,6 +56,12 @@ std::vector<Goal> ND::apply_rule(const std::string rule, const Goal &goal, const
     else if (rule == "exE") {
         return exE(goal);
     }
+    else if (rule == "falseE") {
+        return falseE(goal);
+    }
+    else if (rule == "trueI") {
+        return trueI(goal);
+    }
     else if (rule == "assumption") {
         return assumption(goal);
     }
@@ -484,6 +490,34 @@ std::vector<Goal> ND::exE(const Goal &goal) {
     FormulaPtr rhs = goal.get_rhs();
 
     return {Goal{arbitrary_vars, lhs, rhs}};
+}
+
+std::vector<Goal> ND::falseE(const Goal &goal) {
+    std::set<FormulaPtr> lhs = goal.get_lhs();
+
+    FormulaPtr false_formula;
+    bool found_false = false;
+    for (auto it = lhs.begin(); !found_false && it != lhs.end(); it++) {
+        if (*it == falseConst()) {
+            false_formula = *it;
+            found_false = true;
+        }
+    }
+    if (!found_false) {
+        throw std::runtime_error("Failed to apply rule falseE.");
+    }
+
+    return {};
+}
+
+std::vector<Goal> ND::trueI(const Goal &goal) {
+    FormulaPtr rhs = goal.get_rhs();
+
+    if (rhs != trueConst()) {
+        throw std::runtime_error("Failed to apply rule trueI.");
+    }
+
+    return {};
 }
 
 std::vector<Goal> ND::assumption(const Goal &goal) {

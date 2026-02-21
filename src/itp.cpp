@@ -115,6 +115,9 @@ std::string ITP::get_command_from_user() {
             std::cout << "\texI\t\t - existential quantifier introduction, requires a term for substitution\n";
             std::cout << "\texE\t\t - existential quantifier elimination\n\n";
 
+            std::cout << "\tfalseE\t\t - false constant elimination\n";
+            std::cout << "\ttrueI\t\t - true constant introduction\n\n";
+
             std::cout << "\tassumption\t - use the assumption on the left-hand side" << std::endl;
         }
         else if (command == "goals") {
