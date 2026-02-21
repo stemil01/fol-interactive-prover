@@ -18,7 +18,10 @@
 \newtheorem{corollary}{Posledica}[theorem]
 \newtheorem{lemma}[theorem]{Lema}
 \theoremstyle{remark}
-\newtheorem{example}{Primer}[section]
+\newtheorem{examplex}{Primer}[section]
+\newenvironment{example}
+  {\pushQED{\qed}\renewcommand{\qedsymbol}{$\triangle$}\examplex}
+  {\popQED\endexamplex}
 
 % inference rules
 \usepackage{mathpartir}
@@ -386,7 +389,7 @@ ne pojavljuje slobodno ni u $\Gamma$ ni u $A$.
     \textbf{Egzistencijalni kvantifikator}
     \begin{mathpar}
         \inferrule*[right=exI]
-        {\Gamma \vdash A[x \mapsto y]}
+        {\Gamma \vdash A[x \mapsto t]}
         {\Gamma \vdash \exists x. A}
 
         \inferrule*[right=exE]
@@ -474,15 +477,16 @@ ukoliko postoji dokaz koji se završava sekventom $\vdash F$.
 \section{Opis metode}
 \label{sec:opis_metode}
 
-Interaktivni dokazivač koji se zasniva na prirodnoj dedukciji treba na početku
-da prihvati sa ulaza formulu prvog reda i da zatim očekuje od korisnika pravila
-prirodne dedukcije koja primenjuje kako ih korisnik navodi.
+Interaktivni dokazivači na početku izvršavanja prihvataju od korisnika formulu
+koju dokazuju.
+Zatim očekuju niz pravila koja vode ka dokazuju formule.
+U slučaju dokazivača koji se zasnivaju na prirodnoj dedukciji, pravila će biti
+pravila prirodne dedukcije, odnosno, pravila sa slike \ref{fig:inf-rules}.
 
-Osnovna ideja na kojoj dokazivači rade je da se pravila prirodne dedukcije
-(slika \ref{fig:inf-rules}) primenjuju u suprotnom smeru u odnosu na to kako su
-navedena.
+Osnovna ideja na kojoj dokazivači zasnovani na prirodnoj dedukciji rade je da
+pravila primenjuju u suprotnom smeru u odnosu na to kako su navedena.
 Preciznije, algoritam kreće od ciljne formule koju treba dokazati i izvodi
-nove sekvente menjanjem sekvenata ispod horizontalne linije sekventima
+nove sekvente menjanjem sekvenata ispod horizontalne linije, sekventima
 iznad.
 Takav pristup odgovara čitanju stabla dokaza izvodjenja u primeru
 \ref{ex:proof-tree} odozdo naviše.
@@ -494,22 +498,138 @@ Inicijalno se na stek postavlja sekvent $\vdash F$, gde je $F$ ulazna formula.
 Nakon svakog pravila koje korisnik navede, dokazivač primenjuje pravilo na
 sekvent sa vrha steka i menja ga novim novim sekventima koje pravilo generiše.
 Sekvent je dokazan ukoliko stek postane prazan.
+Opis procedure rada interaktivnog dokazivača dat je
+algoritmom \ref{alg:int-prover}.
 
 \begin{serbianalgorithm}[H]
     \caption{Interktivni dokazivač}
-    \label{alg:varijacije_u_broj}
+    \label{alg:int-prover}
     \textbf{Ulaz:} Formula prvog reda $F$ \\
-    \textbf{Izlaz:} Program se završava kada se formula $F$ dokaže u prirodnoj dedukciji
+    \textbf{Izlaz:} Program se završava kada se formula $F$ dokaže u prirodnoj
+    dedukciji
     \begin{algorithmic}[1]
         \State $s \gets \{ \vdash F \}$
         \While{$s$ nije prazan}
-            \State $p \gets$ pravilo sa standardnog ulaza
+            \State $p \gets$ pravilo sa ulaza
             \State $c \gets$ vrh steka $s$
             \State $c' \gets$ primeni pravilo $p$ na sekvent $c$
             \State izbaci vrh steka $s$ i postavi sekvente $c'$ na vrh
         \EndWhile
     \end{algorithmic}
 \end{serbianalgorithm}
+
+Pravilo prirodne dedukcije se primenljuje na sekvent $c$ tako što se sekvent u
+zaključku pravila $p$ poklopa sa $c$, a kao rezultat vraćaju sekventi
+pretpostavki pravila $p$ na koja su izvršene odgovarajuće zamene.
+Na primer, primena pravila \textsc{disjI1} na sekvent
+$A \land B \vdash A \lor B$ rezultuje u sekventu $A \land B \vdash A$.
+
+Primena pravila će interno zavisiti od toga da li je pravilo tipa uvođenja
+ili tipa eliminacije.
+Za pravila uvođenja, poklapanje zaključka pravila sa sekventom na koji se ono
+primenljuje se dešava tako što se posmatraju desne strane sekvenata.
+Sa druge strane, za pravila eliminacije se posmatraju leve strane sekvenata.
+Opis postupaka za primenu pravila uvođenja i eliminacije dat je algoritmima
+\ref{alg:apply-i} i \ref{alg:apply-e}.
+
+\begin{serbianalgorithm}[H]
+    \caption{Primena pravila uvođenja}
+    \label{alg:apply-i}
+    \textbf{Ulaz:} Sekvent $s$ i pravilo uvođenja $p$ \\
+    \textbf{Izlaz:} Lista sekvenata dobijenih primenom $p$ na $s$
+    \begin{algorithmic}[1]
+        \State $\Gamma \vdash c \gets s$
+        \State $\Gamma' \vdash c' \gets$ sekvent zaključka $p$
+        \If{$c$ i $c'$ nisu istog tipa}
+            \State \Return neuspeh
+        \EndIf
+        \State $l \gets$ lista sekvenata pretpostavki $p$
+        \ForAll{$\overline{\Gamma} \vdash \overline{c}$ u $l$}
+            \State izvrši odgovarajuću zamenu u
+            $\overline{\Gamma}$ i $\overline{c}$
+        \EndFor
+        \State \Return $l$
+    \end{algorithmic}
+\end{serbianalgorithm}
+
+\begin{example}
+    Primena pravila \textsc{conjI}
+    \begin{mathpar}
+        \inferrule*[right=conjI]
+        {\Gamma \vdash A \\ \Gamma \vdash B}
+        {\Gamma \vdash A \land B}
+    \end{mathpar}
+    na sekvent
+    \begin{equation}
+        \label{eq:apply-i}
+        p(x) \leftrightarrow q(x) \vdash
+        (p(x) \rightarrow q(x)) \land (q(x) \rightarrow p(x)).
+    \end{equation}
+
+    Prema algoritmu \ref{alg:apply-i}, treba proveriti poklapanje tipova
+    desne strana sekventa zaključka pravila \textsc{conjI} i sekvenata
+    (\ref{eq:apply-i}).
+    Oni se poklapaju, pa je moguće primeniti pravilo.
+
+    Rezultat je lista sekvenata pretpostavki pravila \textsc{conjI} u kojima
+    je $\Gamma$ zamenjena sa $p(x) \leftrightarrow q(x)$,
+    $A$ sa $p(x) \rightarrow q(x)$ i $B$ sa $q(x) \rightarrow p(x)$, odnosno:
+    $$\left\{ p(x) \leftrightarrow q(x) \vdash p(x) \rightarrow q(x),
+    p(x) \leftrightarrow q(x) \vdash q(x) \rightarrow p(x)\right\}.$$
+\end{example}
+
+\begin{serbianalgorithm}[H]
+    \label{alg:apply-e}
+    \caption{Primena pravila eliminacije}
+    \textbf{Ulaz:} Sekvent $s$ i pravilo eliminacije $p$ \\
+    \textbf{Izlaz:} Lista sekvenata dobijenih primenom $p$ na $s$
+    \begin{algorithmic}[1]
+        \State $\Gamma \vdash c \gets s$
+        \State $\Gamma' \vdash c' \gets$ sekvent zaključka $p$
+        \If{ne postoji formula istog tipa u $\Gamma$ i $\Gamma'$}
+            \State \Return neuspeh
+        \EndIf
+        \State $l \gets$ lista sekvenata pretpostavki $p$
+        \ForAll{$\overline{\Gamma} \vdash \overline{c}$ u $l$}
+            \State izvrši odgovarajuću zamenu u
+            $\overline{\Gamma}$ i $\overline{c}$
+        \EndFor
+        \State \Return $l$
+    \end{algorithmic}
+\end{serbianalgorithm}
+
+\begin{example}
+    Primena pravila \textsc{disjE}
+    \begin{mathpar}
+        \inferrule*[right=disjE]
+        {\Gamma, A \vdash C \\ \Gamma, B \vdash C}
+        {\Gamma, A \lor B \vdash C}
+    \end{mathpar}
+    na sekvent
+    \begin{equation}
+        \label{eq:apply-e}
+        p(x), \neg p(x) \lor q(x) \vdash q(x).
+    \end{equation}
+
+    Prema algoritmu \ref{alg:apply-e}, treba proveriti postojanje formule koja
+    sadrži disjunkciju na levoj strani sekventa (\ref{eq:apply-e}).
+    Ona postoji, pa je moguće primeniti pravilo.
+
+    Rezultat je lista sekvenata pretpostavki pravila \textsc{disjE} u kojima
+    je $\Gamma$ zamenjena sa $p(x)$, $A$ sa $\neg p(x)$, a $B$ i $C$ sa $q(x)$,
+    odnosno:
+    $$\left\{ p(x), \neg p(x) \vdash q(x), p(x), q(x), q(x)\right\}.$$
+\end{example}
+
+Pravila sa kvantifikatorima zahtevaju dodatne uslove tokom primene.
+Konkretno, tokom primene pravila \textsc{allI} i \textsc{exE}, generisani
+sekventi sadrže novu promenljivu $y$.
+Da bi pravilo uspešno primenilo, dovoljno je da se promenljiva $y$ ne pojavljuje
+slobodno ni u jednoj od formula koje učestvuju u pravilima.
+Pored toga, pravila \textsc{allE} i \textsc{exI} zahtevaju navođenje terma $t$
+kojim treba zameniti promenljivu $x$.
+Zato je potrebno da se prilikom primene tih pravila od korisnika zahteva da
+unese i odgovaraju term $t$.
 
 \section{Implementacija}
 \label{sec:implementacija}

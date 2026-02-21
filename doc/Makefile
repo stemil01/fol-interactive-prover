@@ -25,3 +25,4 @@ clean:
 # Remove everything, including the PDF
 distclean:
 	$(LATEXMK) -bibtex -C
+	rm -f *-SAVE-ERROR

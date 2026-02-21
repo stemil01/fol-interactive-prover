@@ -161,7 +161,6 @@ std::vector<Goal> ND::conjE(const Goal &goal) {
     return {Goal{arbitrary_vars, lhs, rhs}};
 }
 
-
 std::vector<Goal> ND::conjunct1(const Goal &goal) {
     std::set<FormulaPtr> lhs = goal.get_lhs();
 
