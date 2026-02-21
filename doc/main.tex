@@ -123,6 +123,7 @@ logičkih simbola i \textit{signature} \cite{janicic2008mlur}.
 \begin{definition}
     Logički deo jezika prvog reda čine skupovi:
     \begin{enumerate}
+        \itemsep-0.3em
         \item prebrojiv skup promenljivih $V$
         \item skupa logičkih veznika
         $\{\neg, \land, \lor, \rightarrow, \leftrightarrow\}$
@@ -147,6 +148,7 @@ koristiti za sintaksu logike prvog reda.
 \begin{definition}
     Skup termova nad signaturom $\mathcal{L}$ je najmanji skup za koji važi:
     \begin{enumerate}
+        \itemsep-0.3em
         \item sve promenljive iz skupa $V$ su termovi
         \item ako je $f \in \Sigma$ funkcijski simbol arnosti $n$ i
         $t_1, t_2, \ldots, t_n$ termovi, onda je i $f(t_1, t_2, \ldots, t_n)$
@@ -158,6 +160,7 @@ koristiti za sintaksu logike prvog reda.
     Skup atomičkih formula nad signaturom $\mathcal{L}$ je namanji skup za koji
     važi:
     \begin{enumerate}
+        \itemsep-0.3em
         \item logičke konstante $\top$ i $\bot$ su atomičke formule
         \item ako je $p \in \Pi$ predikatski simbol arnosti $n$ i
         $t_1, t_2, \ldots, t_n$ termovi, onda je i $p(t_1, t_2, \ldots, t_n)$
@@ -171,6 +174,7 @@ Sada možemo da definišemo skup formula logike prvog reda.
     Skup formula logike prvog reda nad signaturom $\mathcal{L}$ je najmanji
     skup za koji važi:
     \begin{enumerate}
+        \itemsep-0.3em
         \item svaka atomička formula je formula
         \item ako je $A$ formula, onda je i $\neg A$ formula
         \item ako su $A$ i $B$ formule, onda je su i $A \land B$, $A \lor B$,
@@ -203,6 +207,7 @@ kvantifikatora, a slobodno inače.
     Slobodna pojavljivanje promenljive u formuli prvog reda definišemo na
     sledeći način:
     \begin{enumerate}
+        \itemsep-0.3em
         \item sva pojavaljivanja promenljivih u atomičkim formulama su slobodna
         \item sva slobodna pojavljivanja promenljivih u formuli $A$ su slobodna
         i u formuli $\neg A$
@@ -229,6 +234,7 @@ promenljive termom u formuli prvog reda.
     je dobijen tako što se na mesto svakog pojavljivanja promenljive $x$ u termu
     $t$ postavi term $t'$. Preciznije:
     \begin{enumerate}
+        \itemsep-0.3em
         \item $x[x \mapsto t'] = t'$
         \item $y[x \mapsto t'] = y$, za $y \neq x$
         \item $f(t_1, t_2, \dots, t_n)[x \mapsto t']
@@ -240,6 +246,7 @@ promenljive termom u formuli prvog reda.
     Formula $F[x \mapsto t]$ je zamena promenljive $x$ u formuli $F$ termom $t$
     i definišemo je na sledeći način:
     \begin{enumerate}
+        \itemsep-0.3em
         \item $\top [x \mapsto t] = \top$ i $\bot [x \mapsto t] = \bot$
         \item $p(t_1, t_2, \dots, t_n)[x \mapsto t]
         = p(t_1[x \mapsto t], t_2[x \mapsto t], \ldots, t_n[x \mapsto t])$, gde
@@ -263,6 +270,7 @@ promenljive termom u formuli prvog reda.
     Primeri zamena nad signaturom $\mathcal{L}$ iz primera \ref{ex:fol-formulae}
     mogu biti:
     \begin{enumerate}[label=(\arabic*)]
+        \itemsep-0.3em
         \item $\mathrm{paran}(x)[x \mapsto \mathrm{S}(\mathrm{S}(0))]
         = \mathrm{paran}(\mathrm{S}(\mathrm{S}(0)))$
         \item $(\exists x. \mathrm{paran}(x))[x \mapsto 0]
@@ -636,7 +644,6 @@ unese i odgovaraju term $t$.
 \label{sec:implementacija}
 
 Kompletna implementacija dokazivača je urađena u programskom jeziku C++.
-
 K\^od je organizovan na sledeći način:
 \begin{center}
 \begin{minipage}{0.9\linewidth}
@@ -655,8 +662,7 @@ K\^od je organizovan na sledeći način:
     |   |-- main.cpp
     |   |-- nd.cpp
     |   `-- nd.hpp
-    |-- Makefile
-    `-- README.md
+    `-- Makefile
     \end{verbatim}
 \end{minipage}
 \end{center}
@@ -664,6 +670,55 @@ K\^od je organizovan na sledeći način:
 Direktorijum \texttt{parsers} sadrži k\^od za parsiranje formule sa ulaza, kao i
 za parsiranje termova koje korisnik navodi prilikom primene pravila
 \textsc{allE} i \textsc{exI}.
+U njemu se nalaze po dva fajla za generisanje leksičkih i sintaksičkih
+analizatora za formule i termove.
+Leksički analizatori se generišu pomoću alata Flex, a sintaksički analizatori
+pomoću alata GNU Bison.
+
+Direktorijum \texttt{src} sadrži kodove u programskom jeziku C++.
+Fajl \texttt{main.cpp} sadrži polaznu tačku programa koja poziva interaktivni
+dokazivač.
+Ostatak je podeljen u tri celine:
+\begin{enumerate}
+    \itemsep-0.3em
+    \item deo za predstavljanje formula prvog reda (fajlovi \texttt{fol.hpp} i
+    \texttt{fol.cpp})
+    \item deo za osnovnu logiku dokazivača (fajlovi \texttt{itp.hpp} i
+    \texttt{itp.cpp})
+    \item deo za pravila prirodne dedukcije (fajlovi \texttt{nd.hpp} i fajlovi
+    \texttt{nd.cpp})
+\end{enumerate}
+
+Prva grupa definiše tip podataka \texttt{FormulaPtr} koji se koristi u ostatku
+projekta za rad sa formulama prvog reda.
+Pored toga, sadrži i pomoćne funkcije za rad sa formulama kao što su funkcije
+sa zamenu promenljive termom.
+
+Druga grupa fajlova definiše klasu \texttt{ITP} čiji je cilj da predstavi osnovnu
+logiku interaktivnog dokazivača teorema.
+Njen glavni zadatak je predstavljen u metodi \texttt{interactive\_proof} koja
+implementira algoritam \ref{alg:int-prover}.
+
+Treća grupa definiše klasu \texttt{ND} koja sadrži metode za primenu pravila
+prirodne dedukcije tako što za svako pravilo sa slike \ref{fig:inf-rules}
+implementira algoritam \ref{alg:apply-i} ili algoritam \ref{alg:apply-e} u
+zavisnosti od pravila.
+
+Za pokretanje programa potrebno je imati na sistemu:
+\begin{itemize}
+    \itemsep-0.3em
+    \item \texttt{Make}
+    \item \texttt{Flex}
+    \item \texttt{Bison}
+    \item \texttt{GCC}
+\end{itemize}
+Program se prevodi pokretanjem komande \texttt{make} koja na osnovu fajla
+\texttt{Makefile} formira direktorijum \texttt{build} koji sadrži fajlove
+napravljene tokom izgradnje projekta.
+Taj direktorijum, pored objektnih fajlova koje pravi kompajler,
+sadrži i fajlove generisane alatima Flex i GNU Bison.
+Interaktivni dokazivač se poziva pokretanjem izvršivog fajla
+\texttt{build/folip}.
 
 \section{Zaklju\v cak}
 \label{sec:zakljucak}
