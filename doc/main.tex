@@ -51,6 +51,9 @@
   }
   {\end{algorithm}}
 
+% figures
+\usepackage{float}
+
 % misc
 \usepackage{enumitem}
 
@@ -63,9 +66,17 @@
 \maketitle
 
 \begin{abstract}
- Ovaj dokument predstavlja uputstvo za izradu seminarskog rada iz predmeta ,,Automatsko rezonovanje'' na master studijama na Matemati\v ckom fakultetu u Beogradu. Ujedno, ovaj dokument predstavlja primer po\v zeljne strukture samog rada. Ovaj paragraf predstavlja sa\v zetak (ili apstrakt) koji treba da postoji u svakom radu.
- Sa\v zetak predstavlja rezime samog rada, tj.
- ~sadr\v zaj rada prepri\v can u nekoliko re\v cenica. Sa\v zetak ne treba da sadr\v zi vi\v se od 100 re\v ci.
+    Interaktivni dokazivači teorema predstavaljaju sredinu izmedju potpuno
+    automatskih dokazivača, čija je mogućnost dokazivanja ograničena, i ljudskih
+    dokaza, koji mogu da sadrže greške.
+    Kao takvi, omogućavaju dokazivanje složenih teorema uz sigurnost ispravnosti
+    dokaza.
+    Prirodna dedukcija je deduktivni sistem pogodan za automatizaciju koji je
+    inspirisan načinom dokazivanja čoveka.
+    U ovom radu su opisani interaktivni dokazivači teorema u prirodnoj dedukciji
+    za logiku prvog reda.
+    Pored toga, data je i potpuna implementacija jednog takvog dokazivača u
+    programskom jeziku C++.
 \end{abstract}
 
 \section{Uvod}
@@ -85,7 +96,8 @@ U medjuvremenu se svaki korak mehanički proverava, a jednostavnija
 medjutvrđenja se automatski dokazuju.
 Rezultat je potpuno mehanički proveren dokaz koji je često čitljiv ljudima.
 Primeri interaktivnih dokazivača koji su upotrebi danas su
-Isabelle/HOL \cite{nipkow2002isabelle}, Rocq \cite{rocq2026development} i
+Isabelle/HOL \cite{nipkow2002isabelle},
+Rocq \cite{bertot2013interactive}\cite{rocq2026development} i
 Lean \cite{moura2021lean}.
 
 Većina modernih dokazivača rezonuje sa logikama višeg reda, a deduktivni
@@ -95,7 +107,7 @@ dedukciji.
 Prirodna dedukcija je odabrana kao deduktivni sistem koji teži da ima čitljivost
 ljudskih dokaza ali je i pogodan za implementaciju na računaru.
 Konkretno, cilj ovog rada je (1) opisivanje interaktivnih dokazivača teorema za
-logku prvog reda zasnovanih na prirodnoj dedukciji, i (2) kompletna
+logiku prvog reda zasnovanih na prirodnoj dedukciji, i (2) kompletna
 implementacija jednog takvog dokazivača u programskom jeziku C++.
 
 Ostatak ovog rada organizovan je na sledeći način.
@@ -110,14 +122,14 @@ metodu opisanu u radu.
 \section{Osnove}
 \label{sec:osnove}
 
-U ovom poglavlju dajemo uvodimo i dajemo formalan opis sintakse logike prvog
-reda i prirodno dedukcije u njoj.
+U ovom poglavlju uvodimo formalan opis sintakse logike prvog reda i prirodno
+dedukcije u njoj.
 
 \subsection{Sintaksa logike prvog reda}
 
 Logika prvog reda (ili predikatska logika) je značajno ekspresivnija od iskazne
 logike i proširuje njenu sitaksnu.
-Jezik nad kojim se logika prvog reda definiše se sastoji od logičkih dela tj.
+Jezik nad kojim se logika prvog reda definiše se sastoji od logičkog dela tj.
 logičkih simbola i \textit{signature} \cite{janicic2008mlur}.
 
 \begin{definition}
@@ -321,7 +333,7 @@ zaključku se pojavljuje konjukncija na levoj strani.
 Pravila \textsc{allI} i \textsc{exE} imaju dodatni uslov da se promenljiva $y$
 ne pojavljuje slobodno ni u $\Gamma$ ni u $A$.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \textbf{Negacija}
     \begin{mathpar}
@@ -511,7 +523,7 @@ Opis procedure rada interaktivnog dokazivača dat je
 algoritmom \ref{alg:int-prover}.
 
 \begin{serbianalgorithm}[H]
-    \caption{Interktivni dokazivač}
+    \caption{Interaktivni dokazivač}
     \label{alg:int-prover}
     \textbf{Ulaz:} Formula prvog reda $F$ \\
     \textbf{Izlaz:} Program se završava kada se formula $F$ dokaže u prirodnoj
@@ -633,7 +645,7 @@ Opis postupaka za primenu pravila uvođenja i eliminacije dat je algoritmima
 Pravila sa kvantifikatorima zahtevaju dodatne uslove tokom primene.
 Konkretno, tokom primene pravila \textsc{allI} i \textsc{exE}, generisani
 sekventi sadrže novu promenljivu $y$.
-Da bi pravilo uspešno primenilo, dovoljno je da se promenljiva $y$ ne pojavljuje
+Da bi se pravilo uspešno primenilo, dovoljno je da se promenljiva $y$ ne pojavljuje
 slobodno ni u jednoj od formula koje učestvuju u pravilima.
 Pored toga, pravila \textsc{allE} i \textsc{exI} zahtevaju navođenje terma $t$
 kojim treba zameniti promenljivu $x$.
@@ -691,8 +703,8 @@ Ostatak je podeljen u tri celine:
 
 Prva grupa definiše tip podataka \texttt{FormulaPtr} koji se koristi u ostatku
 projekta za rad sa formulama prvog reda.
-Pored toga, sadrži i pomoćne funkcije za rad sa formulama kao što su funkcije
-sa zamenu promenljive termom.
+Pored toga, sadrži i pomoćne funkcije za rad sa formulama kao što je funkcija
+za zamenu promenljive termom.
 
 Druga grupa fajlova definiše klasu \texttt{ITP} čiji je cilj da predstavi osnovnu
 logiku interaktivnog dokazivača teorema.
