@@ -38,10 +38,6 @@ void ITP::interactive_proof(FormulaPtr formula) {
             }
         }
         else {
-            size_t colon_index = command.find(':');
-            if (colon_index != std::string::npos) {
-                std::string rule = command.substr(0, command.find(':'));
-            }
             try {
                 GoalDiff goal_diff(ND::apply_rule(command, current_goal, input_term));
                 goal_diff.apply(goals);
