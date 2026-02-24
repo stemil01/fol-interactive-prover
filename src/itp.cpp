@@ -14,6 +14,7 @@ void ITP::interactive_proof(FormulaPtr formula) {
     std::stack<GoalDiff> diffs;
     goals.push(Goal(std::set<std::string>(), std::set<FormulaPtr>(), formula));
     print_goals(goals);
+    std::cout << "Type 'help' for help." << std::endl;
 
     while (!goals.empty()) {
         Goal current_goal = goals.top();
