@@ -74,7 +74,7 @@
     Prirodna dedukcija je deduktivni sistem pogodan za automatizaciju koji je
     inspirisan načinom dokazivanja čoveka.
     U ovom radu su opisani interaktivni dokazivači teorema u prirodnoj dedukciji
-    za logiku prvog reda.
+    za intuicionističku logiku prvog reda.
     Pored toga, data je i potpuna implementacija jednog takvog dokazivača u
     programskom jeziku C++.
 \end{abstract}
@@ -102,19 +102,19 @@ Lean \cite{moura2021lean}.
 
 Većina modernih dokazivača rezonuje sa logikama višeg reda, a deduktivni
 sistemi na kojima se zasnivaju variraju \cite{maric2015survey}.
-U ovom radu se ograničavamo na dokazivače u logici prvog reda u prirodnoj
-dedukciji.
+U ovom radu se ograničavamo na dokazivače u intuicionističkoj logici prvog reda
+u prirodnoj dedukciji.
 Prirodna dedukcija je odabrana kao deduktivni sistem koji teži da ima čitljivost
 ljudskih dokaza ali je i pogodan za implementaciju na računaru.
 Konkretno, cilj ovog rada je (1) opisivanje interaktivnih dokazivača teorema za
-logiku prvog reda zasnovanih na prirodnoj dedukciji, i (2) kompletna
-implementacija jednog takvog dokazivača u programskom jeziku C++.
+intuicionističku logiku prvog reda zasnovanih na prirodnoj dedukciji, i
+(2) kompletna implementacija jednog takvog dokazivača u programskom jeziku C++.
 
 Ostatak ovog rada organizovan je na sledeći način.
 U poglavlju \ref{sec:osnove} navodimo osnovne definicije, pojmove i notaciju
 koja će biti korišćena u ostatku rada.
 U poglavlju \ref{sec:opis_metode} dajemo detaljni opis algoritma za
-primenjivanje pravila prirodne dedukcije za logiku prvog reda.
+primenjivanje pravila prirodne dedukcije za intuicionističku logiku prvog reda.
 Poglavlje \ref{sec:implementacija} sadrži detalje implementacije dokazivača.
 Najzad, poglavlje \ref{sec:zakljucak} sadrži zaključna razmatranja i osvrt na
 metodu opisanu u radu.
@@ -122,7 +122,7 @@ metodu opisanu u radu.
 \section{Osnove}
 \label{sec:osnove}
 
-U ovom poglavlju uvodimo formalan opis sintakse logike prvog reda i prirodno
+U ovom poglavlju uvodimo formalan opis sintakse logike prvog reda i prirodne
 dedukcije u njoj.
 
 \subsection{Sintaksa logike prvog reda}
@@ -137,11 +137,11 @@ logičkih simbola i \textit{signature} \cite{janicic2008mlur}.
     \begin{enumerate}
         \itemsep-0.3em
         \item prebrojiv skup promenljivih $V$
-        \item skupa logičkih veznika
+        \item skup logičkih veznika
         $\{\neg, \land, \lor, \rightarrow, \leftrightarrow\}$
-        \item skupa kvantifikatora $\{\forall, \exists\}$
-        \item skupa logičkih konstanti $\{\top, \bot\}$
-        \item skupa pomoćnih simbola $\{(, ), ,\}$.
+        \item skup kvantifikatora $\{\forall, \exists\}$
+        \item skup logičkih konstanti $\{\top, \bot\}$
+        \item skup pomoćnih simbola $\{(, ), ,\}$.
     \end{enumerate}
 \end{definition}
 
@@ -234,7 +234,7 @@ kvantifikatora, a slobodno inače.
 \end{definition}
 
 \begin{example}
-    U formulama iz primera \ref{ex:fol-formulae} promenljiva $x$ se pojavaljuje
+    U formulama iz primera \ref{ex:fol-formulae} promenljiva $x$ se pojavljuje
     vezano, dok se promenljiva $y$ pojavljuje slobodno.
 \end{example}
 
@@ -287,7 +287,7 @@ promenljive termom u formuli prvog reda.
         = \mathrm{paran}(\mathrm{S}(\mathrm{S}(0)))$
         \item $(\exists x. \mathrm{paran}(x))[x \mapsto 0]
         = \exists x. \mathrm{paran}(x)$
-        \item $(\exists x. \mathrm{paran}(y))[x \mapsto \mathrm{S}(y)]
+        \item $(\exists y. \mathrm{paran}(x))[x \mapsto \mathrm{S}(y)]
         = \exists y'. \mathrm{paran}(\mathrm{S}(y))$
     \end{enumerate}
 \end{example}
@@ -322,7 +322,7 @@ Pravila se mogu grupisati u dve kategorije: pravila uvođenja i pravila
 eliminacije.
 Na slici \ref{fig:inf-rules}, imena pravila uvođenja se završavaju sa $I$,
 a pravila eliminacije sa $E$.
-Razlika među njima je što pravila uvođenja uvode odgovajući logički simbol na
+Razlika među njima je što pravila uvođenja uvode odgovarajući logički simbol na
 desnu, dok pravila eliminacije uvode odgovarajući simbol na
 levu stranu sekventa.
 Na primer, pravilo \textsc{conjI} u sekventima u pretpostavkama nema konjunkciju
@@ -438,7 +438,7 @@ ne pojavljuje slobodno ni u $\Gamma$ ni u $A$.
 \end{figure}
 
 \begin{definition}
-Dokaz u prirodnoj dedukciji je konačan niz sekvenata takvih da je svaki naredni
+Dokaz u prirodnoj dedukciji je konačno stablo sekvenata takvih da je svaki naredni
 dobijen primenom nekog od pravila sa slike \ref{fig:inf-rules} na ranije
 sekvente.
 
@@ -450,8 +450,7 @@ ukoliko postoji dokaz koji se završava sekventom $\vdash F$.
     \label{ex:proof-tree}
     Formula $\neg (\exists x. p(x) \lor q(x))
     \rightarrow (\forall x. \neg p(x) \land \neg q(x))$ je dokaziva.
-    Dokazi u prirodnoj dedukciji se često prikazuju pomoću stabla, i dokaz
-    za ovu formulu može da izgleda ovako:
+    Dokaz za ovu formulu može da izgleda ovako:
 
     \begin{prooftree}
         \AxiomC{}
@@ -527,7 +526,7 @@ dokazati.
 U svakom trenutku, vrh steka predstavlja sekvent koji se trenutno dokazuje.
 Inicijalno se na stek postavlja sekvent $\vdash F$, gde je $F$ ulazna formula.
 Nakon svakog pravila koje korisnik navede, dokazivač primenjuje pravilo na
-sekvent sa vrha steka i menja ga novim novim sekventima koje pravilo generiše.
+sekvent sa vrha steka i menja ga novim sekventima koje pravilo generiše.
 Sekvent je dokazan ukoliko stek postane prazan.
 Opis procedure rada interaktivnog dokazivača dat je
 algoritmom \ref{alg:int-prover}.
@@ -746,7 +745,7 @@ Interaktivni dokazivač se poziva pokretanjem izvršivog fajla
 \label{sec:zakljucak}
 
 U ovom radu je opisana implementacija interaktivnih dokazivača teorema za
-logiku prvog reda u prirodnoj dedukciji.
+intuicionističku logiku prvog reda u prirodnoj dedukciji.
 Opisana je sintaksa logike prvog reda i pravila prirodne dedukcije, kao i
 algoritmi za rad dokazivača i primenu pravila.
 Na kraju je data potpuna implementacija i opis jednog dokazivača u programskom
